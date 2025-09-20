@@ -296,6 +296,7 @@ export default function ProductsPage() {
                 </label>
                 <input
                   type="text"
+                  placeholder="SKU-001"
                   required
                   value={formData.sku}
                   onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
@@ -309,6 +310,7 @@ export default function ProductsPage() {
                 </label>
                 <input
                   type="text"
+                  placeholder="Wireless Mouse"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -321,6 +323,7 @@ export default function ProductsPage() {
                   Description
                 </label>
                 <textarea
+                  placeholder="Brief description..."
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
@@ -336,6 +339,7 @@ export default function ProductsPage() {
                   <input
                     type="number"
                     step="0.01"
+                    placeholder="999.00"
                     required
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
@@ -350,6 +354,7 @@ export default function ProductsPage() {
                   <input
                     type="number"
                     step="0.01"
+                    placeholder="18"
                     value={formData.tax_percentage}
                     onChange={(e) => setFormData({ ...formData, tax_percentage: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -363,6 +368,7 @@ export default function ProductsPage() {
                 </label>
                 <input
                   type="text"
+                  placeholder="8471"
                   value={formData.hsn_code}
                   onChange={(e) => setFormData({ ...formData, hsn_code: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"

@@ -31,6 +31,13 @@ input, select, textarea {
   background-color: #ffffff;
 }
 
+/* Semi-transparent placeholder styling */
+input::placeholder,
+textarea::placeholder {
+  color: rgba(17, 24, 39, 0.30) !important; /* gray-900 at 30% */
+  opacity: 1; /* ensure consistency across browsers */
+}
+
 .dashboard-header-content {
   max-width: 80rem;
   margin: 0 auto;
@@ -74,7 +81,7 @@ input, select, textarea {
 /* Navigation integrated into header */
 .dashboard-nav-links {
   display: flex;
-  gap: 2rem;
+  gap: 2rem; /* equal spacing between page names */
   margin-top: 0;
   padding-bottom: 0;
 }
@@ -90,6 +97,23 @@ input, select, textarea {
 
 .dashboard-nav-link:hover {
   color: #ffffff;
+}
+
+/* Active page: full white + bold + larger */
+.dashboard-nav-link.active {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.125rem; /* 18px for emphasis */
+  position: relative;
+  top: -1px; /* Slight nudge to visually center the larger text */
+}
+
+/* Right-aligned auth area with significant separation from pages */
+.dashboard-auth {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 3rem; /* at least 1.5x the 2rem nav gap */
 }
 
 /* Content Spacer to prevent overlap with fixed header */

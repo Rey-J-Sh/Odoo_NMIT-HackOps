@@ -291,6 +291,7 @@ export default function ContactsPage() {
                 </label>
                 <input
                   type="text"
+                  placeholder="Jane Doe"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -304,6 +305,7 @@ export default function ContactsPage() {
                 </label>
                 <input
                   type="email"
+                  placeholder="jane@example.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -316,6 +318,7 @@ export default function ContactsPage() {
                 </label>
                 <input
                   type="tel"
+                  placeholder="+91 98765 43210"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -327,6 +330,7 @@ export default function ContactsPage() {
                   Address
                 </label>
                 <textarea
+                  placeholder="Street, City, State, PIN"
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   rows={3}

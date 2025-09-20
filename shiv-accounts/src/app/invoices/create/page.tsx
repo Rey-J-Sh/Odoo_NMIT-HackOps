@@ -262,6 +262,7 @@ export default function CreateInvoicePage() {
                 </label>
                 <input
                   type="date"
+                  placeholder="Select invoice date"
                   required
                   value={formData.invoice_date}
                   onChange={(e) => setFormData({ ...formData, invoice_date: e.target.value })}
@@ -275,6 +276,7 @@ export default function CreateInvoicePage() {
                 </label>
                 <input
                   type="date"
+                  placeholder="Select due date"
                   value={formData.due_date}
                   onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -340,6 +342,7 @@ export default function CreateInvoicePage() {
                     </label>
                     <input
                       type="text"
+                      placeholder="Item description"
                       required
                       value={line.description}
                       onChange={(e) => updateInvoiceLine(line.id, 'description', e.target.value)}
@@ -355,6 +358,7 @@ export default function CreateInvoicePage() {
                       type="number"
                       min="0.01"
                       step="0.01"
+                      placeholder="1.00"
                       required
                       value={line.quantity}
                       onChange={(e) => updateInvoiceLine(line.id, 'quantity', parseFloat(e.target.value) || 0)}
@@ -370,6 +374,7 @@ export default function CreateInvoicePage() {
                       type="number"
                       min="0"
                       step="0.01"
+                      placeholder="0.00"
                       required
                       value={line.unit_price}
                       onChange={(e) => updateInvoiceLine(line.id, 'unit_price', parseFloat(e.target.value) || 0)}
@@ -385,6 +390,7 @@ export default function CreateInvoicePage() {
                       type="number"
                       min="0"
                       step="0.01"
+                      placeholder="18"
                       value={line.tax_percentage}
                       onChange={(e) => updateInvoiceLine(line.id, 'tax_percentage', parseFloat(e.target.value) || 0)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
