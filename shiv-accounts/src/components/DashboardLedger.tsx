@@ -1,7 +1,8 @@
 'use client'
 
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import Navigation from './Navigation'
+import Link from 'next/link'
 import { ReactNode } from 'react'
 
 interface DashboardLedgerProps {
@@ -12,46 +13,18 @@ interface DashboardLedgerProps {
 
 export default function DashboardLedger({ actionRight }: DashboardLedgerProps) {
   const pathname = usePathname()
-  const isActive = (path: string) => pathname === path
+  
   return (
     <>
-      {/* Combined Header and Navigation */}
       <header className="dashboard-header">
         <div className="dashboard-header-content">
-          <div className="dashboard-header-inner">
-            {/* Left: Navigation */}
-            <div className="dashboard-nav-links">
-              <Link href="/" className={`dashboard-nav-link ${isActive('/') ? 'active' : ''}`}>
-                Dashboard
-              </Link>
-              <Link href="/contacts" className={`dashboard-nav-link ${isActive('/contacts') ? 'active' : ''}`}>
-                Contacts
-              </Link>
-              <Link href="/products" className={`dashboard-nav-link ${isActive('/products') ? 'active' : ''}`}>
-                Products
-              </Link>
-              <Link href="/invoices" className={`dashboard-nav-link ${isActive('/invoices') ? 'active' : ''}`}>
-                Invoices
-              </Link>
-              <Link href="/payments" className={`dashboard-nav-link ${isActive('/payments') ? 'active' : ''}`}>
-                Payments
-              </Link>
-              <Link href="/ledger" className={`dashboard-nav-link ${isActive('/ledger') ? 'active' : ''}`}>
-                Ledger
-              </Link>
-              <Link href="/reports" className={`dashboard-nav-link ${isActive('/reports') ? 'active' : ''}`}>
-                Reports
-              </Link>
-            </div>
-
-            {/* Right: Optional page action + Auth */}
-            <div className="dashboard-auth">
-              {actionRight && (
-                <div className="hidden md:block mr-4">{actionRight}</div>
-              )}
-              <Link href="/login" className="dashboard-nav-link">Log in</Link>
-              <Link href="/signup" className="btn btn-primary">Sign up</Link>
-            </div>
+          <div className="dashboard-nav-container">
+            <Navigation activePath={pathname} />
+            
+            {/* Right: Optional page action */}
+            {actionRight && (
+              <div className="hidden md:block mr-4">{actionRight}</div>
+            )}
           </div>
         </div>
       </header>

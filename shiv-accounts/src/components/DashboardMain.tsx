@@ -1,55 +1,34 @@
 'use client'
 
-import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import Navigation from './Navigation'
 
 interface DashboardMainProps {
-  title: string
-  subtitle: string
+  children?: React.ReactNode
 }
 
-export default function DashboardMain({ title, subtitle }: DashboardMainProps) {
+export default function DashboardMain({ children }: DashboardMainProps) {
+  const pathname = usePathname()
+
   return (
-    <>
-      {/* Combined Header and Navigation */}
+    <div className="min-h-screen bg-gray-100">
       <header className="dashboard-header">
         <div className="dashboard-header-content">
-          <div className="dashboard-header-inner">
-            <div>
-              <h1 className="dashboard-title">{title}</h1>
-              <p className="dashboard-subtitle">{subtitle}</p>
-            </div>
-          </div>
-          
-          {/* Navigation integrated into header */}
-          <div className="dashboard-nav-links">
-            <Link href="/" className="dashboard-nav-link">
-              Dashboard
-            </Link>
-            <Link href="/contacts" className="dashboard-nav-link">
-              Contacts
-            </Link>
-            <Link href="/products" className="dashboard-nav-link">
-              Products
-            </Link>
-            <Link href="/invoices" className="dashboard-nav-link">
-              Invoices
-            </Link>
-            <Link href="/payments" className="dashboard-nav-link">
-              Payments
-            </Link>
-            <Link href="/ledger" className="dashboard-nav-link">
-              Ledger
-            </Link>
-            <Link href="/reports" className="dashboard-nav-link">
-              Reports
-            </Link>
+          <div className="dashboard-nav-container">
+            <Navigation activePath={pathname} />
           </div>
         </div>
       </header>
 
       {/* Content Spacer */}
       <div className="dashboard-content-spacer"></div>
-
-    </>
+      
+      {/* Main content container with semi-transparent black background */}
+      <main className="min-h-[calc(100vh-64px)] bg-black/70 p-4 sm:p-6 md:p-8">
+        <div className="max-w-7xl mx-auto">
+          {children}
+        </div>
+      </main>
+    </div>
   )
 }
