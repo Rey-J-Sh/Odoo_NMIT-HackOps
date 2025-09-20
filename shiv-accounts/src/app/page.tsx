@@ -2,14 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import DashboardHeader from '@/components/DashboardHeader'
 import { 
   Users, 
   Package, 
   FileText, 
   CreditCard, 
   TrendingUp, 
-  DollarSign,
-  Calendar,
   AlertCircle
 } from 'lucide-react'
 
@@ -159,54 +158,19 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Shiv Accounts Cloud</h1>
-              <p className="text-gray-600">Cloud-based accounting system for furniture business</p>
-            </div>
-            <div className="flex space-x-4">
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                New Invoice
-              </button>
-              <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
-                New Contact
-              </button>
-            </div>
-          </div>
+      <DashboardHeader 
+        title="Shiv Accounts Cloud" 
+        subtitle="Cloud-based accounting system for furniture business"
+      >
+        <div className="flex space-x-4">
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+            New Invoice
+          </button>
+          <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+            New Contact
+          </button>
         </div>
-      </header>
-
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-8">
-            <a href="/" className="border-b-2 border-blue-600 text-blue-600 py-4 px-1 text-sm font-medium">
-              Dashboard
-            </a>
-            <a href="/contacts" className="text-gray-500 hover:text-gray-700 py-4 px-1 text-sm font-medium">
-              Contacts
-            </a>
-            <a href="/products" className="text-gray-500 hover:text-gray-700 py-4 px-1 text-sm font-medium">
-              Products
-            </a>
-            <a href="/invoices" className="text-gray-500 hover:text-gray-700 py-4 px-1 text-sm font-medium">
-              Invoices
-            </a>
-            <a href="/payments" className="text-gray-500 hover:text-gray-700 py-4 px-1 text-sm font-medium">
-              Payments
-            </a>
-            <a href="/ledger" className="text-gray-500 hover:text-gray-700 py-4 px-1 text-sm font-medium">
-              Ledger
-            </a>
-            <a href="/reports" className="text-gray-500 hover:text-gray-700 py-4 px-1 text-sm font-medium">
-              Reports
-            </a>
-          </div>
-        </div>
-      </nav>
+      </DashboardHeader>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import { Plus, Minus, Save, ArrowLeft, FileText, User, Package } from 'lucide-react'
+import DashboardHeader from '@/components/DashboardHeader'
+import { Plus, Minus, Save, ArrowLeft, User, Package } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 interface Contact {
@@ -113,7 +114,7 @@ export default function CreateInvoicePage() {
     }
   }
 
-  const updateInvoiceLine = (id: string, field: keyof InvoiceLine, value: any) => {
+  const updateInvoiceLine = (id: string, field: keyof InvoiceLine, value: string | number) => {
     setInvoiceLines(invoiceLines.map(line => {
       if (line.id === id) {
         const updatedLine = { ...line, [field]: value }
@@ -220,62 +221,27 @@ export default function CreateInvoicePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <button
-                onClick={() => router.back()}
-                className="mr-4 text-gray-400 hover:text-gray-600 transition-colors"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </button>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">Create Invoice</h1>
-                <p className="text-gray-600">Create a new sales invoice</p>
-              </div>
-            </div>
-            <button
-              onClick={handleSubmit}
-              disabled={saving || !formData.contact_id}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-            >
-              <Save className="h-4 w-4 mr-2" />
-              {saving ? 'Saving...' : 'Save Invoice'}
-            </button>
-          </div>
+      <DashboardHeader 
+        title="Create Invoice" 
+        subtitle="Create a new sales invoice"
+      >
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={() => router.back()}
+            className="text-gray-300 hover:text-white transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <button
+            onClick={handleSubmit}
+            disabled={saving || !formData.contact_id}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+          >
+            <Save className="h-4 w-4 mr-2" />
+            {saving ? 'Saving...' : 'Save Invoice'}
+          </button>
         </div>
-      </header>
-
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-8">
-            <a href="/" className="text-gray-500 hover:text-gray-700 py-4 px-1 text-sm font-medium">
-              Dashboard
-            </a>
-            <a href="/contacts" className="text-gray-500 hover:text-gray-700 py-4 px-1 text-sm font-medium">
-              Contacts
-            </a>
-            <a href="/products" className="text-gray-500 hover:text-gray-700 py-4 px-1 text-sm font-medium">
-              Products
-            </a>
-            <a href="/invoices" className="border-b-2 border-blue-600 text-blue-600 py-4 px-1 text-sm font-medium">
-              Invoices
-            </a>
-            <a href="/payments" className="text-gray-500 hover:text-gray-700 py-4 px-1 text-sm font-medium">
-              Payments
-            </a>
-            <a href="/ledger" className="text-gray-500 hover:text-gray-700 py-4 px-1 text-sm font-medium">
-              Ledger
-            </a>
-            <a href="/reports" className="text-gray-500 hover:text-gray-700 py-4 px-1 text-sm font-medium">
-              Reports
-            </a>
-          </div>
-        </div>
-      </nav>
+      </DashboardHeader>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -361,7 +327,7 @@ export default function CreateInvoicePage() {
             </div>
 
             <div className="space-y-4">
-              {invoiceLines.map((line, index) => (
+              {invoiceLines.map((line) => (
                 <div key={line.id} className="grid grid-cols-1 md:grid-cols-6 gap-4 p-4 border border-gray-200 rounded-lg">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -370,7 +336,7 @@ export default function CreateInvoicePage() {
                     <div className="relative">
                       <Package className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                       <select
-                        value={line.product_id}
+                        value={line.product_id || ''}
                         onChange={(e) => updateInvoiceLine(line.id, 'product_id', e.target.value)}
                         className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >

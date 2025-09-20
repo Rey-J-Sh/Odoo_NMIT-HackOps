@@ -183,7 +183,7 @@ export default function PaymentModal({
               <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <select
                 value={formData.payment_method}
-                onChange={(e) => setFormData({ ...formData, payment_method: e.target.value as any })}
+                onChange={(e) => setFormData({ ...formData, payment_method: e.target.value as 'cash' | 'bank_transfer' | 'cheque' | 'card' })}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="cash">Cash</option>

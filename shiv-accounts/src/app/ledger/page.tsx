@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
-import { Search, Download, Filter, BookOpen, Calendar, DollarSign } from 'lucide-react'
+import DashboardHeader from '@/components/DashboardHeader'
+import { Search, Download, Filter, BookOpen, Calendar } from 'lucide-react'
 import { format } from 'date-fns'
 
 interface LedgerEntry {
@@ -22,28 +23,16 @@ interface LedgerEntry {
   }
 }
 
-interface Contact {
-  id: string
-  name: string
-  contact_type: 'customer' | 'vendor'
-}
 
 export default function LedgerPage() {
   const [ledgerEntries, setLedgerEntries] = useState<LedgerEntry[]>([])
-  const [contacts, setContacts] = useState<Contact[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const [contactFilter, setContactFilter] = useState('all')
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
   const [accountFilter, setAccountFilter] = useState('all')
 
-  useEffect(() => {
-    fetchLedgerEntries()
-    fetchContacts()
-  }, [])
-
-  const fetchLedgerEntries = async () => {
+  const fetchLedgerEntries = useCallback(async () => {
     try {
       let query = supabase
         .from('ledger_entries')
@@ -75,21 +64,11 @@ export default function LedgerPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [dateFrom, dateTo])
 
-  const fetchContacts = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('contacts')
-        .select('id, name, contact_type')
-        .order('name')
-
-      if (error) throw error
-      setContacts(data || [])
-    } catch (error) {
-      console.error('Error fetching contacts:', error)
-    }
-  }
+  useEffect(() => {
+    fetchLedgerEntries()
+  }, [fetchLedgerEntries])
 
   const handleExportCSV = () => {
     const headers = ['Date', 'Account', 'Description', 'Reference Type', 'Reference ID', 'Debit', 'Credit']
@@ -168,53 +147,18 @@ export default function LedgerPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">General Ledger</h1>
-              <p className="text-gray-600">Double-entry bookkeeping records</p>
-            </div>
-            <button
-              onClick={handleExportCSV}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Export CSV
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-8">
-            <a href="/" className="text-gray-500 hover:text-gray-700 py-4 px-1 text-sm font-medium">
-              Dashboard
-            </a>
-            <a href="/contacts" className="text-gray-500 hover:text-gray-700 py-4 px-1 text-sm font-medium">
-              Contacts
-            </a>
-            <a href="/products" className="text-gray-500 hover:text-gray-700 py-4 px-1 text-sm font-medium">
-              Products
-            </a>
-            <a href="/invoices" className="text-gray-500 hover:text-gray-700 py-4 px-1 text-sm font-medium">
-              Invoices
-            </a>
-            <a href="/payments" className="text-gray-500 hover:text-gray-700 py-4 px-1 text-sm font-medium">
-              Payments
-            </a>
-            <a href="/ledger" className="border-b-2 border-blue-600 text-blue-600 py-4 px-1 text-sm font-medium">
-              Ledger
-            </a>
-            <a href="/reports" className="text-gray-500 hover:text-gray-700 py-4 px-1 text-sm font-medium">
-              Reports
-            </a>
-          </div>
-        </div>
-      </nav>
+      <DashboardHeader 
+        title="General Ledger" 
+        subtitle="Double-entry bookkeeping records"
+      >
+        <button
+          onClick={handleExportCSV}
+          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center"
+        >
+          <Download className="h-4 w-4 mr-2" />
+          Export CSV
+        </button>
+      </DashboardHeader>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
