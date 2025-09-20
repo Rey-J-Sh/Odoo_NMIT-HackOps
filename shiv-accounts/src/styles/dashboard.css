@@ -13,6 +13,24 @@
   z-index: 50;
 }
 
+/* Accessibility: enforce darker text for better visibility across light backgrounds */
+/* These overrides intentionally strengthen gray text utilities used in components */
+.text-gray-600 { color: #111827 !important; }
+.text-gray-500 { color: #111827 !important; }
+.text-gray-400 { color: #374151 !important; }
+.text-gray-300 { color: #4b5563 !important; }
+
+/* Ensure default paragraph and div text are sufficiently dark inside main content */
+.dashboard-main, .dashboard-card, .dashboard-table {
+  color: #111827;
+}
+
+/* Force readable form control text across the app */
+input, select, textarea {
+  color: #111827 !important;
+  background-color: #ffffff;
+}
+
 .dashboard-header-content {
   max-width: 80rem;
   margin: 0 auto;
@@ -35,7 +53,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 0 1rem 0;
+  padding: 1rem 0;
 }
 
 .dashboard-title {
@@ -43,19 +61,22 @@
   font-weight: bold;
   color: #ffffff;
   margin: 0;
+  display: inline;
+  margin-right: 1rem;
 }
 
 .dashboard-subtitle {
   color: #d1d5db;
   margin: 0;
+  display: inline;
 }
 
 /* Navigation integrated into header */
 .dashboard-nav-links {
   display: flex;
   gap: 2rem;
-  margin-top: 1rem;
-  padding-bottom: 1rem;
+  margin-top: 0;
+  padding-bottom: 0;
 }
 
 .dashboard-nav-link {
@@ -73,13 +94,13 @@
 
 /* Content Spacer to prevent overlap with fixed header */
 .dashboard-content-spacer {
-  height: 140px;
+  height: 100px;
 }
 
 /* Main Content Area */
 .dashboard-main {
   max-width: 80rem;
-  margin: 0 auto;
+  margin: 2rem auto 0 auto;
   padding: 2rem 1rem;
 }
 
@@ -249,13 +270,12 @@
 
 .dashboard-form-input:focus {
   outline: none;
-  ring: 2px;
-  ring-color: #2563eb;
-  border-color: transparent;
+  box-shadow: 0 0 0 2px #2563eb;
+  border-color: #2563eb;
 }
 
 .dashboard-form-input::placeholder {
-  color: rgba(0, 0, 0, 0.75);
+  color: rgba(0, 0, 0, 1.0);
 }
 
 .dashboard-form-select {
@@ -270,13 +290,19 @@
 
 .dashboard-form-select:focus {
   outline: none;
-  ring: 2px;
-  ring-color: #2563eb;
-  border-color: transparent;
+  box-shadow: 0 0 0 2px #2563eb;
+  border-color: #2563eb;
 }
 
 .dashboard-form-select::placeholder {
-  color: rgba(0, 0, 0, 0.75);
+  color: rgba(0, 0, 0, 1.0);
+}
+
+/* Global placeholder styles for all inputs */
+input::placeholder,
+textarea::placeholder {
+  color: rgba(0, 0, 0, 1.0) !important;
+  opacity: 1 !important;
 }
 
 /* Table Styles - Preserving existing table functionality */

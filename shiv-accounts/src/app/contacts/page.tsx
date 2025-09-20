@@ -160,9 +160,9 @@ export default function ContactsPage() {
       <main className="dashboard-main">
         {/* Search and Filters */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-          <div className="flex items-center space-x-4">
-            <div className="flex-1">
-              <div className="relative">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex-1 min-w-[260px]">
+              <div className="relative w-full">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <input
                   type="text"
@@ -173,8 +173,17 @@ export default function ContactsPage() {
                 />
               </div>
             </div>
-            <div className="text-sm text-gray-600">
-              {filteredContacts.length} contact{filteredContacts.length !== 1 ? 's' : ''}
+            <div className="flex items-center gap-3">
+              <div className="text-sm text-gray-600">
+                {filteredContacts.length} contact{filteredContacts.length !== 1 ? 's' : ''}
+              </div>
+              <button
+                onClick={() => setShowModal(true)}
+                className="btn btn-secondary"
+              >
+                <Plus className="btn-icon" />
+                Add New Contact
+              </button>
             </div>
           </div>
         </div>
@@ -245,10 +254,17 @@ export default function ContactsPage() {
             <p className="text-gray-600 mb-4">
               {searchTerm ? 'Try adjusting your search terms.' : 'Get started by adding your first contact.'}
             </p>
+            <button
+              onClick={() => setShowModal(true)}
+              className="btn btn-secondary"
+            >
+              <Plus className="btn-icon" />
+              Add New Contact
+            </button>
           </div>
         )}
 
-        {/* Pagination with Action Buttons */}
+        {/* Pagination */}
         {filteredContacts.length > 0 && (
           <Pagination
             currentPage={currentPage}
@@ -256,15 +272,6 @@ export default function ContactsPage() {
             onPageChange={handlePageChange}
             totalItems={filteredContacts.length}
             itemsPerPage={itemsPerPage}
-            actionButtons={
-              <button
-                onClick={() => setShowModal(true)}
-                className="btn btn-primary"
-              >
-                <Plus className="btn-icon" />
-                Add Contact
-              </button>
-            }
           />
         )}
       </main>
@@ -279,7 +286,7 @@ export default function ContactsPage() {
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
                   Name *
                 </label>
                 <input
@@ -292,7 +299,7 @@ export default function ContactsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
                   Email
                 </label>
                 <input
@@ -304,7 +311,7 @@ export default function ContactsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
                   Phone
                 </label>
                 <input
@@ -316,7 +323,7 @@ export default function ContactsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
                   Address
                 </label>
                 <textarea
@@ -328,7 +335,7 @@ export default function ContactsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
                   Type *
                 </label>
                 <select

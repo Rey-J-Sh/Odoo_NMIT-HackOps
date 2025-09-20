@@ -150,9 +150,9 @@ export default function InvoicesPage() {
       <main className="dashboard-main">
         {/* Search and Filters */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-          <div className="flex items-center space-x-4">
-            <div className="flex-1">
-              <div className="relative">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex-1 min-w-[260px]">
+              <div className="relative w-full">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <input
                   type="text"
@@ -163,7 +163,7 @@ export default function InvoicesPage() {
                 />
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center gap-3">
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
@@ -179,6 +179,13 @@ export default function InvoicesPage() {
               <div className="text-sm text-gray-600">
                 {filteredInvoices.length} invoice{filteredInvoices.length !== 1 ? 's' : ''}
               </div>
+              <a
+                href="/invoices/create"
+                className="btn btn-secondary"
+              >
+                <Plus className="btn-icon" />
+                New Invoice
+              </a>
             </div>
           </div>
         </div>
@@ -289,7 +296,7 @@ export default function InvoicesPage() {
           </div>
         )}
 
-        {/* Pagination with Action Buttons */}
+        {/* Pagination */}
         {filteredInvoices.length > 0 && (
           <Pagination
             currentPage={currentPage}
@@ -297,15 +304,6 @@ export default function InvoicesPage() {
             onPageChange={handlePageChange}
             totalItems={filteredInvoices.length}
             itemsPerPage={itemsPerPage}
-            actionButtons={
-              <a
-                href="/invoices/create"
-                className="btn btn-primary"
-              >
-                <Plus className="btn-icon" />
-                New Invoice
-              </a>
-            }
           />
         )}
       </main>

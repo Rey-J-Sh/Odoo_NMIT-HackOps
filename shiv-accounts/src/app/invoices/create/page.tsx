@@ -235,7 +235,7 @@ export default function CreateInvoicePage() {
             <h2 className="text-lg font-medium text-gray-900 mb-4">Invoice Details</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
                   Customer *
                 </label>
                 <div className="relative">
@@ -244,7 +244,7 @@ export default function CreateInvoicePage() {
                     required
                     value={formData.contact_id}
                     onChange={(e) => setFormData({ ...formData, contact_id: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="">Select Customer</option>
                     {contacts.map(contact => (
@@ -257,7 +257,7 @@ export default function CreateInvoicePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
                   Invoice Date *
                 </label>
                 <input
@@ -265,24 +265,24 @@ export default function CreateInvoicePage() {
                   required
                   value={formData.invoice_date}
                   onChange={(e) => setFormData({ ...formData, invoice_date: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
                   Due Date
                 </label>
                 <input
                   type="date"
                   value={formData.due_date}
                   onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
                   Notes
                 </label>
                 <input
@@ -290,7 +290,7 @@ export default function CreateInvoicePage() {
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   placeholder="Additional notes..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -314,7 +314,7 @@ export default function CreateInvoicePage() {
               {invoiceLines.map((line) => (
                 <div key={line.id} className="grid grid-cols-1 md:grid-cols-6 gap-4 p-4 border border-gray-200 rounded-lg">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-900 mb-1">
                       Product
                     </label>
                     <div className="relative">
@@ -322,7 +322,7 @@ export default function CreateInvoicePage() {
                       <select
                         value={line.product_id || ''}
                         onChange={(e) => updateInvoiceLine(line.id, 'product_id', e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
                         <option value="">Select Product</option>
                         {products.map(product => (
@@ -335,7 +335,7 @@ export default function CreateInvoicePage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-900 mb-1">
                       Description *
                     </label>
                     <input
@@ -343,12 +343,12 @@ export default function CreateInvoicePage() {
                       required
                       value={line.description}
                       onChange={(e) => updateInvoiceLine(line.id, 'description', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-900 mb-1">
                       Quantity *
                     </label>
                     <input
@@ -358,12 +358,12 @@ export default function CreateInvoicePage() {
                       required
                       value={line.quantity}
                       onChange={(e) => updateInvoiceLine(line.id, 'quantity', parseFloat(e.target.value) || 0)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-900 mb-1">
                       Unit Price (₹) *
                     </label>
                     <input
@@ -373,12 +373,12 @@ export default function CreateInvoicePage() {
                       required
                       value={line.unit_price}
                       onChange={(e) => updateInvoiceLine(line.id, 'unit_price', parseFloat(e.target.value) || 0)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-900 mb-1">
                       Tax (%)
                     </label>
                     <input
@@ -387,13 +387,13 @@ export default function CreateInvoicePage() {
                       step="0.01"
                       value={line.tax_percentage}
                       onChange={(e) => updateInvoiceLine(line.id, 'tax_percentage', parseFloat(e.target.value) || 0)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
 
                   <div className="flex items-end">
                     <div className="flex-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-900 mb-1">
                         Line Total
                       </label>
                       <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm font-medium">

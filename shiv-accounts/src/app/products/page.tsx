@@ -165,21 +165,30 @@ export default function ProductsPage() {
       <main className="dashboard-main">
         {/* Search and Filters */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-          <div className="flex items-center space-x-4">
-            <div className="flex-1">
-              <div className="relative">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex-1 min-w-[260px]">
+              <div className="relative w-full">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <input
                   type="text"
                   placeholder="Search products..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
-            <div className="text-sm text-gray-600">
-              {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''}
+            <div className="flex items-center gap-3">
+              <div className="text-sm text-gray-600">
+                {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''}
+              </div>
+              <button
+                onClick={() => setShowModal(true)}
+                className="btn btn-secondary"
+              >
+                <Plus className="btn-icon" />
+                Add New Product
+              </button>
             </div>
           </div>
         </div>
@@ -250,10 +259,17 @@ export default function ProductsPage() {
             <p className="text-gray-600 mb-4">
               {searchTerm ? 'Try adjusting your search terms.' : 'Get started by adding your first product.'}
             </p>
+            <button
+              onClick={() => setShowModal(true)}
+              className="btn btn-secondary"
+            >
+              <Plus className="btn-icon" />
+              Add New Product
+            </button>
           </div>
         )}
 
-        {/* Pagination with Action Buttons */}
+        {/* Pagination */}
         {filteredProducts.length > 0 && (
           <Pagination
             currentPage={currentPage}
@@ -261,15 +277,6 @@ export default function ProductsPage() {
             onPageChange={handlePageChange}
             totalItems={filteredProducts.length}
             itemsPerPage={itemsPerPage}
-            actionButtons={
-              <button
-                onClick={() => setShowModal(true)}
-                className="btn btn-primary"
-              >
-                <Plus className="btn-icon" />
-                Add Product
-              </button>
-            }
           />
         )}
       </main>
@@ -284,7 +291,7 @@ export default function ProductsPage() {
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
                   SKU *
                 </label>
                 <input
@@ -292,12 +299,12 @@ export default function ProductsPage() {
                   required
                   value={formData.sku}
                   onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
                   Name *
                 </label>
                 <input
@@ -305,25 +312,25 @@ export default function ProductsPage() {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
                   Description
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-900 mb-1">
                     Price (₹) *
                   </label>
                   <input
@@ -332,12 +339,12 @@ export default function ProductsPage() {
                     required
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-900 mb-1">
                     Tax (%)
                   </label>
                   <input
@@ -345,27 +352,27 @@ export default function ProductsPage() {
                     step="0.01"
                     value={formData.tax_percentage}
                     onChange={(e) => setFormData({ ...formData, tax_percentage: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-900 mb-1">
                   HSN Code
                 </label>
                 <input
                   type="text"
                   value={formData.hsn_code}
                   onChange={(e) => setFormData({ ...formData, hsn_code: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div className="flex space-x-3 pt-4">
                 <button
                   type="submit"
-                  className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
                 >
                   {editingProduct ? 'Update' : 'Create'}
                 </button>
