@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { apiClient } from '@/lib/api'
 import { X, CreditCard, Calendar, DollarSign } from 'lucide-react'
 
 interface PaymentModalProps {

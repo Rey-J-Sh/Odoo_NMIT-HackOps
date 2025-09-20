@@ -1,8 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { apiClient } from '@/lib/api'
 import DashboardMain from '@/components/DashboardMain'
+import Navigation from '@/components/Navigation'
+import ProtectedRoute from '@/components/ProtectedRoute'
+import AuthDebug from '@/components/AuthDebug'
 import { 
   Users, 
   Package, 
@@ -42,60 +45,44 @@ export default function Dashboard() {
   const fetchDashboardStats = async () => {
     try {
       // Fetch contacts count
-      const { count: contactsCount } = await supabase
-        .from('contacts')
-        .select('*', { count: 'exact', head: true })
+      const contactsResponse = await apiClient.request('/contacts?limit=1')
+      const contactsCount = contactsResponse.pagination?.total || 0
 
       // Fetch products count
-      const { count: productsCount } = await supabase
-        .from('products')
-        .select('*', { count: 'exact', head: true })
+      const productsResponse = await apiClient.request('/products?limit=1')
+      const productsCount = productsResponse.pagination?.total || 0
 
       // Fetch invoices count
-      const { count: invoicesCount } = await supabase
-        .from('invoices')
-        .select('*', { count: 'exact', head: true })
+      const invoicesResponse = await apiClient.request('/invoices?limit=1')
+      const invoicesCount = invoicesResponse.pagination?.total || 0
 
       // Fetch total receivables (open + partially paid invoices)
-      const { data: receivablesData } = await supabase
-        .from('invoices')
-        .select('total_amount, paid_amount')
-        .in('status', ['open', 'partially_paid'])
-
-      const totalReceivables = receivablesData?.reduce((sum, invoice) => 
+      const receivablesResponse = await apiClient.request('/invoices?status=open,partially_paid')
+      const totalReceivables = receivablesResponse.invoices?.reduce((sum: number, invoice: any) => 
         sum + (invoice.total_amount - invoice.paid_amount), 0) || 0
 
       // Fetch total revenue (paid invoices)
-      const { data: revenueData } = await supabase
-        .from('invoices')
-        .select('total_amount')
-        .eq('status', 'paid')
-
-      const totalRevenue = revenueData?.reduce((sum, invoice) => 
+      const revenueResponse = await apiClient.request('/invoices?status=paid')
+      const totalRevenue = revenueResponse.invoices?.reduce((sum: number, invoice: any) => 
         sum + invoice.total_amount, 0) || 0
 
       // Fetch unpaid invoices count
-      const { count: unpaidCount } = await supabase
-        .from('invoices')
-        .select('*', { count: 'exact', head: true })
-        .in('status', ['open', 'partially_paid'])
+      const unpaidResponse = await apiClient.request('/invoices?status=open,partially_paid&limit=1')
+      const unpaidCount = unpaidResponse.pagination?.total || 0
 
       // Fetch overdue invoices count
       const today = new Date().toISOString().split('T')[0]
-      const { count: overdueCount } = await supabase
-        .from('invoices')
-        .select('*', { count: 'exact', head: true })
-        .in('status', ['open', 'partially_paid'])
-        .lt('due_date', today)
+      const overdueResponse = await apiClient.request(`/invoices?status=open,partially_paid&due_date_lt=${today}&limit=1`)
+      const overdueCount = overdueResponse.pagination?.total || 0
 
       setStats({
-        totalContacts: contactsCount || 0,
-        totalProducts: productsCount || 0,
-        totalInvoices: invoicesCount || 0,
+        totalContacts: contactsCount,
+        totalProducts: productsCount,
+        totalInvoices: invoicesCount,
         totalReceivables,
         totalRevenue,
-        unpaidInvoices: unpaidCount || 0,
-        overdueInvoices: overdueCount || 0
+        unpaidInvoices: unpaidCount,
+        overdueInvoices: overdueCount
       })
     } catch (error) {
       console.error('Error fetching dashboard stats:', error)
@@ -158,14 +145,18 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <DashboardMain 
-        title="Shiv Accounts Cloud" 
-        subtitle="Cloud-based accounting system for furniture business"
-      />
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50">
+        <AuthDebug />
+        <Navigation />
+        
+        <DashboardMain 
+          title="Shiv Accounts Cloud" 
+          subtitle="Cloud-based accounting system for furniture business"
+        />
 
-      {/* Main Content */}
-      <main className="dashboard-main">
+        {/* Main Content */}
+        <main className="dashboard-main">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {statCards.map((stat, index) => (
@@ -245,7 +236,8 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-      </main>
-    </div>
+        </main>
+      </div>
+    </ProtectedRoute>
   )
 }

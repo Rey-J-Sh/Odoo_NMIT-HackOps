@@ -1,5 +1,5 @@
 -- Shiv Accounts Cloud Database Schema
--- Supabase PostgreSQL Schema for Cloud Accounting System
+-- PostgreSQL Schema for Cloud Accounting System (Custom Backend)
 
 -- Enable necessary extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -100,35 +100,17 @@ CREATE TABLE ledger_entries (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Users (for authentication)
+-- Users (for authentication) - UPDATED FOR CUSTOM BACKEND
 CREATE TABLE users (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,  -- ADDED: Required for custom authentication
     name VARCHAR(200),
     role VARCHAR(20) DEFAULT 'invoicing_user' CHECK (role IN ('admin', 'invoicing_user')),
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-
--- Enable Row Level Security
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
-
--- RLS Policies for users table
-CREATE POLICY "Users can view their own profile" ON users
-    FOR SELECT USING (auth.uid() = id);
-
-CREATE POLICY "Users can update their own profile" ON users
-    FOR UPDATE USING (auth.uid() = id);
-
-CREATE POLICY "Admin can manage all users" ON users
-    FOR ALL USING (
-        EXISTS (
-            SELECT 1 FROM users 
-            WHERE users.id = auth.uid() 
-            AND users.role = 'admin'
-        )
-    );
 
 -- Indexes for performance
 CREATE INDEX idx_invoices_contact_id ON invoices(contact_id);
@@ -138,6 +120,7 @@ CREATE INDEX idx_payments_invoice_id ON payments(invoice_id);
 CREATE INDEX idx_ledger_entries_account_id ON ledger_entries(account_id);
 CREATE INDEX idx_ledger_entries_reference ON ledger_entries(reference_type, reference_id);
 CREATE INDEX idx_ledger_entries_date ON ledger_entries(entry_date);
+CREATE INDEX idx_users_email ON users(email);  -- ADDED: For authentication lookups
 
 -- Functions for automatic calculations
 CREATE OR REPLACE FUNCTION update_invoice_totals()
@@ -282,3 +265,4 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER trigger_update_invoice_payment_status
     AFTER INSERT OR UPDATE OR DELETE ON payments
     FOR EACH ROW EXECUTE FUNCTION update_invoice_payment_status();
+

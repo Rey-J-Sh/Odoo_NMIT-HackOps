@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { apiClient } from '@/lib/api'
 import DashboardReports from '@/components/DashboardReports'
 import { TrendingUp, DollarSign, FileText, Calendar } from 'lucide-react'
 import '@/styles/dashboard.css'
@@ -32,53 +32,33 @@ export default function ReportsPage() {
 
   const fetchReportData = async () => {
     try {
-      // Fetch total revenue (paid invoices)
-      const { data: revenueData } = await supabase
-        .from('invoices')
-        .select('total_amount')
-        .eq('status', 'paid')
+      // Fetch all invoices data
+      const invoicesResponse = await apiClient.request('/invoices')
+      const allInvoices = invoicesResponse.invoices || []
 
-      const totalRevenue = revenueData?.reduce((sum, invoice) => sum + invoice.total_amount, 0) || 0
+      // Calculate metrics from the data
+      const totalRevenue = allInvoices
+        .filter(invoice => invoice.status === 'paid')
+        .reduce((sum, invoice) => sum + invoice.total_amount, 0)
 
-      // Fetch total receivables (open + partially paid)
-      const { data: receivablesData } = await supabase
-        .from('invoices')
-        .select('total_amount, paid_amount')
-        .in('status', ['open', 'partially_paid'])
+      const totalReceivables = allInvoices
+        .filter(invoice => ['open', 'partially_paid'].includes(invoice.status))
+        .reduce((sum, invoice) => sum + (invoice.total_amount - invoice.paid_amount), 0)
 
-      const totalReceivables = receivablesData?.reduce((sum, invoice) => 
-        sum + (invoice.total_amount - invoice.paid_amount), 0) || 0
+      const totalInvoices = allInvoices.length
+      const paidInvoices = allInvoices.filter(invoice => invoice.status === 'paid').length
+      const unpaidInvoices = allInvoices.filter(invoice => ['open', 'partially_paid'].includes(invoice.status)).length
 
-      // Fetch invoice counts
-      const { count: totalInvoices } = await supabase
-        .from('invoices')
-        .select('*', { count: 'exact', head: true })
-
-      const { count: paidInvoices } = await supabase
-        .from('invoices')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'paid')
-
-      const { count: unpaidInvoices } = await supabase
-        .from('invoices')
-        .select('*', { count: 'exact', head: true })
-        .in('status', ['open', 'partially_paid'])
-
-      // Calculate average invoice value
-      const { data: allInvoices } = await supabase
-        .from('invoices')
-        .select('total_amount')
-
-      const averageInvoiceValue = allInvoices?.length 
+      const averageInvoiceValue = allInvoices.length 
         ? allInvoices.reduce((sum, invoice) => sum + invoice.total_amount, 0) / allInvoices.length
         : 0
 
       setReportData({
         totalRevenue,
         totalReceivables,
-        totalInvoices: totalInvoices || 0,
-        paidInvoices: paidInvoices || 0,
-        unpaidInvoices: unpaidInvoices || 0,
+        totalInvoices,
+        paidInvoices,
+        unpaidInvoices,
         averageInvoiceValue
       })
     } catch (error) {

@@ -1,18 +1,238 @@
-import { createClient } from '@supabase/supabase-js'
-import { createBrowserClient } from '@supabase/ssr'
+// API Configuration
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+// API Client
+class ApiClient {
+  private baseURL: string
+  private token: string | null = null
 
-// Client-side Supabase client
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+  constructor(baseURL: string) {
+    this.baseURL = baseURL
+    this.token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null
+  }
 
-// Browser client for SSR
+  setToken(token: string | null) {
+    this.token = token
+    if (typeof window !== 'undefined') {
+      if (token) {
+        localStorage.setItem('auth_token', token)
+      } else {
+        localStorage.removeItem('auth_token')
+      }
+    }
+  }
+
+  private async request(endpoint: string, options: RequestInit = {}) {
+    const url = `${this.baseURL}${endpoint}`
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    }
+
+    if (this.token) {
+      headers.Authorization = `Bearer ${this.token}`
+    }
+
+    const response = await fetch(url, {
+      ...options,
+      headers,
+    })
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Network error' }))
+      throw new Error(error.error || 'Request failed')
+    }
+
+    return response.json()
+  }
+
+  // Auth methods
+  async signIn(email: string, password: string) {
+    const response = await this.request('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    })
+    
+    if (response.token) {
+      this.setToken(response.token)
+    }
+    
+    return response
+  }
+
+  async signUp(email: string, password: string, name: string, role: 'admin' | 'invoicing_user' = 'invoicing_user') {
+    const response = await this.request('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ email, password, name, role }),
+    })
+    
+    if (response.token) {
+      this.setToken(response.token)
+    }
+    
+    return response
+  }
+
+  async signOut() {
+    this.setToken(null)
+    return { error: null }
+  }
+
+  async getCurrentUser() {
+    try {
+      const response = await this.request('/auth/profile')
+      return { user: response.user, error: null }
+    } catch (error) {
+      return { user: null, error }
+    }
+  }
+
+  async getUserProfile(userId: string) {
+    const response = await this.request(`/auth/profile`)
+    return { data: response.user, error: null }
+  }
+
+  // Database methods
+  async from(table: string) {
+    return {
+      select: (columns = '*') => ({
+        eq: (column: string, value: any) => ({
+          single: async () => {
+            const response = await this.request(`/${table}/${value}`)
+            return { data: response, error: null }
+          }
+        }),
+        in: (column: string, values: any[]) => ({
+          select: async () => {
+            const response = await this.request(`/${table}?${column}=${values.join(',')}`)
+            return { data: response[table] || response, error: null }
+          }
+        }),
+        select: async () => {
+          const response = await this.request(`/${table}`)
+          return { data: response[table] || response, error: null }
+        }
+      }),
+      insert: (data: any) => ({
+        select: async () => {
+          const response = await this.request(`/${table}`, {
+            method: 'POST',
+            body: JSON.stringify(data),
+          })
+          return { data: response, error: null }
+        }
+      }),
+      update: (data: any) => ({
+        eq: (column: string, value: any) => ({
+          select: async () => {
+            const response = await this.request(`/${table}/${value}`, {
+              method: 'PUT',
+              body: JSON.stringify(data),
+            })
+            return { data: response, error: null }
+          }
+        })
+      }),
+      delete: () => ({
+        eq: (column: string, value: any) => ({
+          select: async () => {
+            await this.request(`/${table}/${value}`, {
+              method: 'DELETE',
+            })
+            return { data: null, error: null }
+          }
+        })
+      })
+    }
+  }
+}
+
+// Create API client instance
+export const apiClient = new ApiClient(API_BASE_URL)
+
+// Legacy Supabase compatibility
+export const supabase = {
+  auth: {
+    signInWithPassword: async ({ email, password }: { email: string; password: string }) => {
+      try {
+        const response = await apiClient.signIn(email, password)
+        return { data: { user: response.user }, error: null }
+      } catch (error) {
+        return { data: null, error }
+      }
+    },
+    signUp: async ({ email, password, options }: { email: string; password: string; options: { data: { name: string; role: string } } }) => {
+      try {
+        const response = await apiClient.signUp(email, password, options.data.name, options.data.role as 'admin' | 'invoicing_user')
+        return { data: { user: response.user }, error: null }
+      } catch (error) {
+        return { data: null, error }
+      }
+    },
+    signOut: async () => {
+      try {
+        await apiClient.signOut()
+        return { error: null }
+      } catch (error) {
+        return { error }
+      }
+    },
+    getUser: async () => {
+      try {
+        const response = await apiClient.getCurrentUser()
+        return { data: { user: response.user }, error: response.error }
+      } catch (error) {
+        return { data: { user: null }, error }
+      }
+    }
+  }
+}
+
+// Browser client for SSR compatibility
 export const createClientComponentClient = () => {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+  return apiClient
+}
+
+// Auth helper functions
+export const signInWithEmail = async (email: string, password: string) => {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  })
+  return { data, error }
+}
+
+export const signUpWithEmail = async (email: string, password: string, name: string, role: 'admin' | 'invoicing_user' = 'invoicing_user') => {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        name,
+        role
+      }
+    }
+  })
+  return { data, error }
+}
+
+export const signOut = async () => {
+  const { error } = await supabase.auth.signOut()
+  return { error }
+}
+
+export const getCurrentUser = async () => {
+  const { data: { user }, error } = await supabase.auth.getUser()
+  return { user, error }
+}
+
+export const getUserProfile = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', userId)
+    .single()
+  return { data, error }
 }
 
 // Database types
@@ -311,3 +531,4 @@ export interface Database {
     }
   }
 }
+

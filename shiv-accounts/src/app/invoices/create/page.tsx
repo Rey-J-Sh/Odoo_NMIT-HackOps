@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { apiClient } from '@/lib/api'
 import DashboardInvoiceCreate from '@/components/DashboardInvoiceCreate'
 import { Plus, Minus, User, Package } from 'lucide-react'
 import { useRouter } from 'next/navigation'

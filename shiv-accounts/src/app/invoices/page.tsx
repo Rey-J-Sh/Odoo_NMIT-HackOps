@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { apiClient } from '@/lib/api'
 import DashboardInvoices from '@/components/DashboardInvoices'
 import Pagination from '@/components/Pagination'
 import { Edit, Eye, Search, FileText, CreditCard, Plus } from 'lucide-react'

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { supabase } from '@/lib/supabase'
+import { apiClient } from '@/lib/api'
 import DashboardLedger from '@/components/DashboardLedger'
 import Pagination from '@/components/Pagination'
 import { Search, Filter, BookOpen, Calendar, Download } from 'lucide-react'
