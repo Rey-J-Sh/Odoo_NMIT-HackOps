@@ -1,0 +1,449 @@
+/* Dashboard Styles - Centralized CSS to reduce redundancies while preserving all functionality */
+
+/* Combined Header and Navigation - Black background with white text */
+.dashboard-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #000000;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #374151;
+  z-index: 50;
+}
+
+.dashboard-header-content {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .dashboard-header-content {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-header-content {
+    padding: 0 2rem;
+  }
+}
+
+.dashboard-header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 0 1rem 0;
+}
+
+.dashboard-title {
+  font-size: 1.875rem;
+  font-weight: bold;
+  color: #ffffff;
+  margin: 0;
+}
+
+.dashboard-subtitle {
+  color: #d1d5db;
+  margin: 0;
+}
+
+/* Navigation integrated into header */
+.dashboard-nav-links {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.dashboard-nav-link {
+  color: #d1d5db;
+  padding: 0.5rem 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.dashboard-nav-link:hover {
+  color: #ffffff;
+}
+
+/* Content Spacer to prevent overlap with fixed header */
+.dashboard-content-spacer {
+  height: 140px;
+}
+
+/* Main Content Area */
+.dashboard-main {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+@media (min-width: 640px) {
+  .dashboard-main {
+    padding: 2rem 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-main {
+    padding: 2rem 2rem;
+  }
+}
+
+/* Action Buttons Container - Positioned at the bottom of the page */
+.dashboard-actions {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.dashboard-actions-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.dashboard-actions-grid {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Button Styles - Preserving all existing functionality */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.btn-primary {
+  background-color: #2563eb;
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: #1d4ed8;
+}
+
+.btn-secondary {
+  background-color: #10b981;
+  color: #ffffff;
+}
+
+.btn-secondary:hover {
+  background-color: #059669;
+}
+
+.btn-danger {
+  background-color: #ef4444;
+  color: #ffffff;
+}
+
+.btn-danger:hover {
+  background-color: #dc2626;
+}
+
+.btn-icon {
+  margin-right: 0.5rem;
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Card Styles - Preserving existing card functionality */
+.dashboard-card {
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-card-header {
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.dashboard-card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+/* Grid Layouts - Preserving existing grid functionality */
+.dashboard-grid-1 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+.dashboard-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .dashboard-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.dashboard-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .dashboard-grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Form Styles - Preserving existing form functionality */
+.dashboard-form-group {
+  margin-bottom: 1rem;
+}
+
+.dashboard-form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+.dashboard-form-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.dashboard-form-input:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: #2563eb;
+  border-color: transparent;
+}
+
+.dashboard-form-input::placeholder {
+  color: rgba(0, 0, 0, 0.75);
+}
+
+.dashboard-form-select {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  background-color: #ffffff;
+  transition: all 0.2s;
+}
+
+.dashboard-form-select:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: #2563eb;
+  border-color: transparent;
+}
+
+.dashboard-form-select::placeholder {
+  color: rgba(0, 0, 0, 0.75);
+}
+
+/* Table Styles - Preserving existing table functionality */
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.dashboard-table thead {
+  background-color: #f9fafb;
+}
+
+.dashboard-table th {
+  padding: 0.75rem 1.5rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dashboard-table td {
+  padding: 1rem 1.5rem;
+  font-size: 0.875rem;
+  color: #111827;
+  border-top: 1px solid #e5e7eb;
+}
+
+.dashboard-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+/* Status Badges - Preserving existing status functionality */
+.dashboard-status {
+  display: inline-flex;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 9999px;
+}
+
+.dashboard-status-draft {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.dashboard-status-open {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.dashboard-status-paid {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.dashboard-status-cancelled {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* Loading Spinner - Preserving existing loading functionality */
+.dashboard-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.dashboard-spinner {
+  width: 8rem;
+  height: 8rem;
+  border: 2px solid #e5e7eb;
+  border-top: 2px solid #2563eb;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Pagination Styles */
+.dashboard-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  padding: 1rem;
+}
+
+.dashboard-pagination-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dashboard-pagination-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dashboard-pagination button {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  color: #374151;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dashboard-pagination button:hover:not(:disabled) {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.dashboard-pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dashboard-pagination .active {
+  background-color: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+.dashboard-pagination .active:hover {
+  background-color: #1d4ed8;
+}
+
+/* Responsive Design - Preserving all responsive functionality */
+@media (max-width: 640px) {
+  .dashboard-header-content,
+  .dashboard-main {
+    padding: 0 0.5rem;
+  }
+  
+  .dashboard-nav-links {
+    gap: 1rem;
+    overflow-x: auto;
+  }
+  
+  .dashboard-actions-grid {
+    flex-direction: column;
+  }
+  
+  .dashboard-table {
+    font-size: 0.75rem;
+  }
+  
+  .dashboard-table th,
+  .dashboard-table td {
+    padding: 0.5rem;
+  }
+  
+  .dashboard-pagination {
+    flex-wrap: wrap;
+  }
+}

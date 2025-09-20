@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import DashboardHeader from '@/components/DashboardHeader'
+import DashboardMain from '@/components/DashboardMain'
 import { 
   Users, 
   Package, 
@@ -11,6 +11,7 @@ import {
   TrendingUp, 
   AlertCircle
 } from 'lucide-react'
+import '@/styles/dashboard.css'
 
 interface DashboardStats {
   totalContacts: number
@@ -158,22 +159,13 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DashboardHeader 
+      <DashboardMain 
         title="Shiv Accounts Cloud" 
         subtitle="Cloud-based accounting system for furniture business"
-      >
-        <div className="flex space-x-4">
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-            New Invoice
-          </button>
-          <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
-            New Contact
-          </button>
-        </div>
-      </DashboardHeader>
+      />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="dashboard-main">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {statCards.map((stat, index) => (

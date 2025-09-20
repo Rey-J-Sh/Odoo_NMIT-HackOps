@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import DashboardHeader from '@/components/DashboardHeader'
-import { Download, TrendingUp, DollarSign, FileText, Calendar } from 'lucide-react'
+import DashboardReports from '@/components/DashboardReports'
+import { TrendingUp, DollarSign, FileText, Calendar } from 'lucide-react'
+import '@/styles/dashboard.css'
 
 interface ReportData {
   totalRevenue: number
@@ -124,21 +125,13 @@ This is a basic report. More detailed reports will be available in future versio
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DashboardHeader 
+      <DashboardReports 
         title="Reports" 
         subtitle="Financial reports and analytics"
-      >
-        <button
-          onClick={handleExportReport}
-          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center"
-        >
-          <Download className="h-4 w-4 mr-2" />
-          Export Report
-        </button>
-      </DashboardHeader>
+      />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="dashboard-main">
         {/* Financial Summary */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6">

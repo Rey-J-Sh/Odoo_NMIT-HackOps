@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import DashboardHeader from '@/components/DashboardHeader'
-import { Plus, Edit, Trash2, Search, Package } from 'lucide-react'
+import DashboardProducts from '@/components/DashboardProducts'
+import Pagination from '@/components/Pagination'
+import { Edit, Trash2, Search, Package, Plus } from 'lucide-react'
+import '@/styles/dashboard.css'
 
 interface Product {
   id: string
@@ -23,6 +25,7 @@ export default function ProductsPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
   const [formData, setFormData] = useState({
     sku: '',
     name: '',
@@ -31,6 +34,8 @@ export default function ProductsPage() {
     tax_percentage: '18',
     hsn_code: ''
   })
+  
+  const itemsPerPage = 12
 
   useEffect(() => {
     fetchProducts()
@@ -131,6 +136,16 @@ export default function ProductsPage() {
     (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase()))
   )
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedProducts = filteredProducts.slice(startIndex, endIndex)
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -141,21 +156,13 @@ export default function ProductsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DashboardHeader 
+      <DashboardProducts 
         title="Products" 
         subtitle="Manage your product catalog"
-      >
-        <button
-          onClick={() => setShowModal(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Product
-        </button>
-      </DashboardHeader>
+      />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="dashboard-main">
         {/* Search and Filters */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
           <div className="flex items-center space-x-4">
@@ -179,7 +186,7 @@ export default function ProductsPage() {
 
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProducts.map((product) => (
+          {paginatedProducts.map((product) => (
             <div key={product.id} className="bg-white rounded-lg shadow-sm border p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center">
@@ -243,15 +250,27 @@ export default function ProductsPage() {
             <p className="text-gray-600 mb-4">
               {searchTerm ? 'Try adjusting your search terms.' : 'Get started by adding your first product.'}
             </p>
-            {!searchTerm && (
+          </div>
+        )}
+
+        {/* Pagination with Action Buttons */}
+        {filteredProducts.length > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            totalItems={filteredProducts.length}
+            itemsPerPage={itemsPerPage}
+            actionButtons={
               <button
                 onClick={() => setShowModal(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                className="btn btn-primary"
               >
+                <Plus className="btn-icon" />
                 Add Product
               </button>
-            )}
-          </div>
+            }
+          />
         )}
       </main>
 

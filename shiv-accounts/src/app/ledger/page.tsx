@@ -2,9 +2,11 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
-import DashboardHeader from '@/components/DashboardHeader'
-import { Search, Download, Filter, BookOpen, Calendar } from 'lucide-react'
+import DashboardLedger from '@/components/DashboardLedger'
+import Pagination from '@/components/Pagination'
+import { Search, Filter, BookOpen, Calendar, Download } from 'lucide-react'
 import { format } from 'date-fns'
+import '@/styles/dashboard.css'
 
 interface LedgerEntry {
   id: string
@@ -31,6 +33,9 @@ export default function LedgerPage() {
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
   const [accountFilter, setAccountFilter] = useState('all')
+  const [currentPage, setCurrentPage] = useState(1)
+  
+  const itemsPerPage = 12
 
   const fetchLedgerEntries = useCallback(async () => {
     try {
@@ -107,6 +112,16 @@ export default function LedgerPage() {
     return matchesSearch && matchesAccount
   })
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredEntries.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedEntries = filteredEntries.slice(startIndex, endIndex)
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
+
   const getAccountTypeColor = (type: string) => {
     switch (type) {
       case 'asset':
@@ -147,21 +162,13 @@ export default function LedgerPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DashboardHeader 
+      <DashboardLedger 
         title="General Ledger" 
         subtitle="Double-entry bookkeeping records"
-      >
-        <button
-          onClick={handleExportCSV}
-          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center"
-        >
-          <Download className="h-4 w-4 mr-2" />
-          Export CSV
-        </button>
-      </DashboardHeader>
+      />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="dashboard-main">
         {/* Filters */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -271,7 +278,7 @@ export default function LedgerPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredEntries.map((entry) => (
+                {paginatedEntries.map((entry) => (
                   <tr key={entry.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {format(new Date(entry.entry_date), 'MMM dd, yyyy')}
@@ -338,6 +345,26 @@ export default function LedgerPage() {
                 : 'Ledger entries will appear here as you create invoices and record payments.'}
             </p>
           </div>
+        )}
+
+        {/* Pagination with Action Buttons */}
+        {filteredEntries.length > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            totalItems={filteredEntries.length}
+            itemsPerPage={itemsPerPage}
+            actionButtons={
+              <button
+                onClick={handleExportCSV}
+                className="btn btn-secondary"
+              >
+                <Download className="btn-icon" />
+                Export CSV
+              </button>
+            }
+          />
         )}
       </main>
     </div>

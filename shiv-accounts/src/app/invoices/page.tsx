@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import DashboardHeader from '@/components/DashboardHeader'
-import { Plus, Edit, Eye, Search, FileText, CreditCard } from 'lucide-react'
+import DashboardInvoices from '@/components/DashboardInvoices'
+import Pagination from '@/components/Pagination'
+import { Edit, Eye, Search, FileText, CreditCard, Plus } from 'lucide-react'
 import { format } from 'date-fns'
 import PaymentModal from '@/components/PaymentModal'
+import '@/styles/dashboard.css'
 
 interface Invoice {
   id: string
@@ -33,6 +35,9 @@ export default function InvoicesPage() {
   const [statusFilter, setStatusFilter] = useState('all')
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  
+  const itemsPerPage = 12
 
   useEffect(() => {
     fetchInvoices()
@@ -105,6 +110,16 @@ export default function InvoicesPage() {
     return matchesSearch && matchesStatus
   })
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedInvoices = filteredInvoices.slice(startIndex, endIndex)
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
+
   const handleRecordPayment = (invoice: Invoice) => {
     setSelectedInvoice(invoice)
     setShowPaymentModal(true)
@@ -126,21 +141,13 @@ export default function InvoicesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DashboardHeader 
+      <DashboardInvoices 
         title="Invoices" 
         subtitle="Manage your sales invoices"
-      >
-        <a
-          href="/invoices/create"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          New Invoice
-        </a>
-      </DashboardHeader>
+      />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="dashboard-main">
         {/* Search and Filters */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
           <div className="flex items-center space-x-4">
@@ -209,7 +216,7 @@ export default function InvoicesPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredInvoices.map((invoice) => (
+                {paginatedInvoices.map((invoice) => (
                   <tr key={invoice.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -279,15 +286,27 @@ export default function InvoicesPage() {
                 ? 'Try adjusting your search or filter criteria.' 
                 : 'Get started by creating your first invoice.'}
             </p>
-            {!searchTerm && statusFilter === 'all' && (
+          </div>
+        )}
+
+        {/* Pagination with Action Buttons */}
+        {filteredInvoices.length > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            totalItems={filteredInvoices.length}
+            itemsPerPage={itemsPerPage}
+            actionButtons={
               <a
                 href="/invoices/create"
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                className="btn btn-primary"
               >
-                Create Invoice
+                <Plus className="btn-icon" />
+                New Invoice
               </a>
-            )}
-          </div>
+            }
+          />
         )}
       </main>
 

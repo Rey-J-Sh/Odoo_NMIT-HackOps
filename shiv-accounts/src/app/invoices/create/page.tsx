@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import DashboardHeader from '@/components/DashboardHeader'
-import { Plus, Minus, Save, ArrowLeft, User, Package } from 'lucide-react'
+import DashboardInvoiceCreate from '@/components/DashboardInvoiceCreate'
+import { Plus, Minus, User, Package } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import '@/styles/dashboard.css'
 
 interface Contact {
   id: string
@@ -221,30 +222,13 @@ export default function CreateInvoicePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DashboardHeader 
+      <DashboardInvoiceCreate 
         title="Create Invoice" 
         subtitle="Create a new sales invoice"
-      >
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={() => router.back()}
-            className="text-gray-300 hover:text-white transition-colors"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={saving || !formData.contact_id}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-          >
-            <Save className="h-4 w-4 mr-2" />
-            {saving ? 'Saving...' : 'Save Invoice'}
-          </button>
-        </div>
-      </DashboardHeader>
+      />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="dashboard-main">
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Invoice Header */}
           <div className="bg-white rounded-lg shadow-sm border p-6">

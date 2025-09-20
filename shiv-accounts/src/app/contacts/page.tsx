@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import DashboardHeader from '@/components/DashboardHeader'
-import { Plus, Edit, Trash2, Search, Users, Building } from 'lucide-react'
+import DashboardContacts from '@/components/DashboardContacts'
+import Pagination from '@/components/Pagination'
+import { Edit, Trash2, Search, Users, Building, Plus } from 'lucide-react'
+import '@/styles/dashboard.css'
 
 interface Contact {
   id: string
@@ -22,6 +24,7 @@ export default function ContactsPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [editingContact, setEditingContact] = useState<Contact | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -29,6 +32,8 @@ export default function ContactsPage() {
     address: '',
     contact_type: 'customer' as 'customer' | 'vendor'
   })
+  
+  const itemsPerPage = 12
 
   useEffect(() => {
     fetchContacts()
@@ -126,6 +131,16 @@ export default function ContactsPage() {
     (contact.phone && contact.phone.includes(searchTerm))
   )
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredContacts.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedContacts = filteredContacts.slice(startIndex, endIndex)
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -136,21 +151,13 @@ export default function ContactsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DashboardHeader 
+      <DashboardContacts 
         title="Contacts" 
         subtitle="Manage your customers and vendors"
-      >
-        <button
-          onClick={() => setShowModal(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Contact
-        </button>
-      </DashboardHeader>
+      />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="dashboard-main">
         {/* Search and Filters */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
           <div className="flex items-center space-x-4">
@@ -174,7 +181,7 @@ export default function ContactsPage() {
 
         {/* Contacts Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredContacts.map((contact) => (
+          {paginatedContacts.map((contact) => (
             <div key={contact.id} className="bg-white rounded-lg shadow-sm border p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center">
@@ -238,15 +245,27 @@ export default function ContactsPage() {
             <p className="text-gray-600 mb-4">
               {searchTerm ? 'Try adjusting your search terms.' : 'Get started by adding your first contact.'}
             </p>
-            {!searchTerm && (
+          </div>
+        )}
+
+        {/* Pagination with Action Buttons */}
+        {filteredContacts.length > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            totalItems={filteredContacts.length}
+            itemsPerPage={itemsPerPage}
+            actionButtons={
               <button
                 onClick={() => setShowModal(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                className="btn btn-primary"
               >
+                <Plus className="btn-icon" />
                 Add Contact
               </button>
-            )}
-          </div>
+            }
+          />
         )}
       </main>
 
