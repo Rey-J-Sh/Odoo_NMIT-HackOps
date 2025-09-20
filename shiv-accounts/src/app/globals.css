@@ -3,6 +3,83 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  font-size: 15px; /* Slightly increased from 14px */
+}
+
+/* Base styles */
+html {
+  font-size: 0.9375rem; /* 15px */
+  line-height: 1.5;
+}
+
+/* Headings */
+h1 {
+  font-size: 1.75rem; /* 28px - increased from 24px */
+  font-weight: 600;
+  margin-bottom: 1.1rem;
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: 1.5rem; /* 24px - increased from 20px */
+  font-weight: 600;
+  margin-bottom: 0.85rem;
+  line-height: 1.25;
+}
+
+h3 {
+  font-size: 1.25rem; /* 20px - increased from 18px */
+  font-weight: 500;
+  margin-bottom: 0.6rem;
+  line-height: 1.3;
+}
+
+/* Base text elements */
+p, li, a, button, input, textarea, select, label, span, div {
+  font-size: 0.9375rem; /* 15px - increased from 14px */
+  line-height: 1.5;
+}
+
+/* Adjust smaller text classes */
+.text-sm {
+  font-size: 0.8125rem; /* 13px - increased from 12px */
+}
+
+.text-xs {
+  font-size: 0.6875rem; /* 11px - increased from 10px */
+}
+
+/* Form elements */
+input, textarea, select, button {
+  font-size: 0.9375rem; /* 15px */
+  padding: 0.4375rem 0.5625rem; /* Slightly increased padding */
+}
+
+/* Placeholder opacity */
+::placeholder {
+  opacity: 0.2 !important;
+  color: inherit;
+}
+
+/* For Chrome, Safari, Edge, Opera */
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+  opacity: 0.2 !important;
+  color: inherit;
+}
+
+/* For Firefox */
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+  opacity: 0.2 !important;
+  color: inherit;
+}
+
+/* For Microsoft Edge */
+input::-ms-input-placeholder,
+textarea::-ms-input-placeholder {
+  opacity: 0.2 !important;
+  color: inherit;
 }
 
 @theme inline {

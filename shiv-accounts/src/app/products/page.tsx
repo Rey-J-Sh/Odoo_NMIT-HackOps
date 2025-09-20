@@ -3,9 +3,45 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import DashboardProducts from '@/components/DashboardProducts'
+import Image from 'next/image'
 import Pagination from '@/components/Pagination'
 import { Edit, Trash2, Search, Package, Plus } from 'lucide-react'
 import '@/styles/dashboard.css'
+
+// Inline styles for placeholders
+const placeholderStyle: React.CSSProperties = {
+  opacity: 1, // Ensure text is fully visible
+  color: 'inherit',
+};
+
+// Add global styles for placeholders
+const globalStyles = `
+  input::placeholder,
+  textarea::placeholder {
+    opacity: 0.3 !important;
+    color: inherit;
+  }
+  input::-webkit-input-placeholder,
+  textarea::-webkit-input-placeholder {
+    opacity: 0.3 !important;
+    color: inherit;
+  }
+  input::-moz-placeholder,
+  textarea::-moz-placeholder {
+    opacity: 0.3 !important;
+    color: inherit;
+  }
+  input:-ms-input-placeholder,
+  textarea:-ms-input-placeholder {
+    opacity: 0.3 !important;
+    color: inherit;
+  }
+  input:-moz-placeholder,
+  textarea:-moz-placeholder {
+    opacity: 0.3 !important;
+    color: inherit;
+  }
+`;
 
 interface Product {
   id: string
@@ -31,8 +67,9 @@ export default function ProductsPage() {
     name: '',
     description: '',
     price: '',
-    tax_percentage: '18',
-    hsn_code: ''
+    tax_percentage: '',
+    hsn_code: '',
+    is_active: true
   })
   
   const itemsPerPage = 12
@@ -94,7 +131,15 @@ export default function ProductsPage() {
 
       setShowModal(false)
       setEditingProduct(null)
-      setFormData({ sku: '', name: '', description: '', price: '', tax_percentage: '18', hsn_code: '' })
+      setFormData({ 
+        sku: '', 
+        name: '', 
+        description: '', 
+        price: '', 
+        tax_percentage: '18', 
+        hsn_code: '',
+        is_active: true 
+      })
       fetchProducts()
     } catch (error) {
       console.error('Error saving product:', error)
@@ -109,7 +154,8 @@ export default function ProductsPage() {
       description: product.description || '',
       price: product.price.toString(),
       tax_percentage: product.tax_percentage.toString(),
-      hsn_code: product.hsn_code || ''
+      hsn_code: product.hsn_code || '',
+      is_active: product.is_active
     })
     setShowModal(true)
   }
@@ -183,7 +229,19 @@ export default function ProductsPage() {
                 {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''}
               </div>
               <button
-                onClick={() => setShowModal(true)}
+                onClick={() => {
+                  setFormData({
+                    sku: '',
+                    name: '',
+                    description: '',
+                    price: '',
+                    tax_percentage: '18',
+                    hsn_code: '',
+                    is_active: true
+                  })
+                  setEditingProduct(null)
+                  setShowModal(true)
+                }}
                 className="btn btn-secondary"
               >
                 <Plus className="btn-icon" />
@@ -260,7 +318,19 @@ export default function ProductsPage() {
               {searchTerm ? 'Try adjusting your search terms.' : 'Get started by adding your first product.'}
             </p>
             <button
-              onClick={() => setShowModal(true)}
+              onClick={() => {
+                setFormData({
+                  sku: '',
+                  name: '',
+                  description: '',
+                  price: '',
+                  tax_percentage: '18',
+                  hsn_code: '',
+                  is_active: true
+                })
+                setEditingProduct(null)
+                setShowModal(true)
+              }}
               className="btn btn-secondary"
             >
               <Plus className="btn-icon" />
@@ -283,8 +353,27 @@ export default function ProductsPage() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
+        <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
+          {/* Background with image and blur */}
+          <div className="fixed inset-0 bg-black/60">
+            <div className="absolute inset-0">
+              <div className="w-full h-full">
+                <Image
+                  src="/images/background.jpg"
+                  alt="Background"
+                  width={1920}
+                  height={1080}
+                  className="w-full h-full object-cover blur-lg"
+                  quality={50}
+                  priority
+                />
+              </div>
+            </div>
+            <div className="absolute inset-0 backdrop-blur-sm"></div>
+          </div>
+          
+          {/* Modal Content */}
+          <div className="bg-white/95 backdrop-blur-sm rounded-lg max-w-md w-full p-6 relative z-10 shadow-2xl border border-white/20">
             <h2 className="text-xl font-bold text-gray-900 mb-4">
               {editingProduct ? 'Edit Product' : 'Add New Product'}
             </h2>
@@ -301,6 +390,7 @@ export default function ProductsPage() {
                   value={formData.sku}
                   onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  style={placeholderStyle}
                 />
               </div>
 
@@ -315,6 +405,7 @@ export default function ProductsPage() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  style={placeholderStyle}
                 />
               </div>
 
@@ -328,6 +419,7 @@ export default function ProductsPage() {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  style={placeholderStyle}
                 />
               </div>
 
@@ -344,6 +436,7 @@ export default function ProductsPage() {
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    style={placeholderStyle}
                   />
                 </div>
 
@@ -358,6 +451,7 @@ export default function ProductsPage() {
                     value={formData.tax_percentage}
                     onChange={(e) => setFormData({ ...formData, tax_percentage: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    style={placeholderStyle}
                   />
                 </div>
               </div>
@@ -372,6 +466,7 @@ export default function ProductsPage() {
                   value={formData.hsn_code}
                   onChange={(e) => setFormData({ ...formData, hsn_code: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  style={placeholderStyle}
                 />
               </div>
 
@@ -387,7 +482,15 @@ export default function ProductsPage() {
                   onClick={() => {
                     setShowModal(false)
                     setEditingProduct(null)
-                    setFormData({ sku: '', name: '', description: '', price: '', tax_percentage: '18', hsn_code: '' })
+                    setFormData({ 
+                      sku: '', 
+                      name: '', 
+                      description: '', 
+                      price: '', 
+                      tax_percentage: '18', 
+                      hsn_code: '',
+                      is_active: true 
+                    })
                   }}
                   className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors"
                 >

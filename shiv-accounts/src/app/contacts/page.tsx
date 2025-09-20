@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase'
 import DashboardContacts from '@/components/DashboardContacts'
 import Pagination from '@/components/Pagination'
 import { Edit, Trash2, Search, Users, Building, Plus } from 'lucide-react'
+import Image from 'next/image'
 import '@/styles/dashboard.css'
 
 interface Contact {
@@ -278,8 +279,24 @@ export default function ContactsPage() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
+        <div className="fixed inset-0 flex items-center justify-center p-4 z-50">
+          {/* Background with image and blur */}
+          <div className="fixed inset-0 bg-black/60">
+            <div className="absolute inset-0">
+              <Image
+                src="/BG.jpeg"
+                alt="Background"
+                fill
+                className="object-cover blur-lg"
+                quality={50}
+                priority
+              />
+            </div>
+            <div className="absolute inset-0 backdrop-blur-sm"></div>
+          </div>
+          
+          {/* Modal Content */}
+          <div className="bg-white/95 backdrop-blur-sm rounded-lg max-w-md w-full p-6 relative z-10 shadow-2xl border border-white/20">
             <h2 className="text-xl font-bold text-gray-900 mb-4">
               {editingContact ? 'Edit Contact' : 'Add New Contact'}
             </h2>

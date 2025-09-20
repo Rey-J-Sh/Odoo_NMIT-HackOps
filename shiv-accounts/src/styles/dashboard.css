@@ -1,15 +1,17 @@
 /* Dashboard Styles - Centralized CSS to reduce redundancies while preserving all functionality */
 
-/* Combined Header and Navigation - Black background with white text */
+/* Combined Header and Navigation - Semi-transparent black background with white text */
 .dashboard-header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  background-color: #000000;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: #ffffff;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border-bottom: 1px solid #374151;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   z-index: 50;
 }
 
@@ -147,7 +149,9 @@ textarea::placeholder {
 
 /* Content spacer to push content below fixed header */
 .dashboard-content-spacer {
-  height: 64px; /* Adjust based on your header height */
+  height: 64px; /* Match the header height */
+  position: relative;
+  z-index: 1;
 }
 
 /* Main content area */
@@ -168,6 +172,20 @@ textarea::placeholder {
 
 .dashboard-main-content > *:last-child {
   margin-bottom: 0;
+}
+
+/* Ensure content is above the background */
+main {
+  position: relative;
+  z-index: 1;
+}
+
+/* Smooth transitions for better UX */
+.dashboard-nav-link,
+.dashboard-nav-button,
+main,
+.dashboard-card {
+  transition: all 0.3s ease;
 }
 
 .dashboard-main {
@@ -234,13 +252,91 @@ textarea::placeholder {
   background-color: #1d4ed8;
 }
 
+/* Placeholder styles - Extremely subtle */
+input::placeholder,
+textarea::placeholder {
+  color: #f9fafb !important; /* Nearly white */
+  opacity: 0.3 !important; /* Very subtle */
+  transition: opacity 0.2s ease;
+}
+
+/* No change on focus - keep it consistently subtle */
+input:focus::placeholder,
+textarea:focus::placeholder {
+  opacity: 0.5 !important;
+}
+
+/* WebKit browsers */
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+  color: #f9fafb !important;
+  opacity: 0.3 !important;
+}
+
+input:focus::-webkit-input-placeholder,
+textarea:focus::-webkit-input-placeholder {
+  opacity: 0.5 !important;
+}
+
+/* Firefox */
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+  color: #f9fafb !important;
+  opacity: 0.3 !important;
+}
+
+input:focus::-moz-placeholder,
+textarea:focus::-moz-placeholder {
+  opacity: 0.5 !important;
+}
+
+/* Microsoft Edge */
+input:-ms-input-placeholder,
+textarea:-ms-input-placeholder {
+  color: #f9fafb !important;
+  opacity: 0.3 !important;
+}
+
+input:focus:-ms-input-placeholder,
+textarea:focus:-ms-input-placeholder {
+  opacity: 0.5 !important;
+}
+
+/* Button styles */
 .btn-secondary {
   background-color: #10b981;
   color: #ffffff;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.btn-secondary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('/BG-Image.avif');
+  background-size: cover;
+  background-position: center;
+  filter: blur(4px) brightness(0.8);
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btn-secondary:hover::before {
+  opacity: 1;
 }
 
 .btn-secondary:hover {
-  background-color: #059669;
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
 }
 
 .btn-danger {

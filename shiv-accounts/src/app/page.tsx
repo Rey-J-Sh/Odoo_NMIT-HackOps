@@ -158,14 +158,11 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <DashboardMain 
-        title="Shiv Accounts Cloud" 
-        subtitle="Cloud-based accounting system for furniture business"
-      />
-
-      {/* Main Content */}
-      <main className="dashboard-main">
+    <DashboardMain 
+      title="Shiv Accounts Cloud" 
+      subtitle="Cloud-based accounting system for furniture business"
+    >
+      <div className="dashboard-main">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {statCards.map((stat, index) => (
@@ -245,7 +242,7 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </DashboardMain>
   )
 }
