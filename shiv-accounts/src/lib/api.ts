@@ -162,9 +162,19 @@ class ApiClient {
     return { data: response.invoices || response, error: null }
   }
 
+  async getPayments() {
+    const response = await this.request('/payments')
+    return { data: response.payments || response, error: null }
+  }
+
   async getLedgerEntries() {
     const response = await this.request('/ledger_entries')
     return { data: response.ledger_entries || response, error: null }
+  }
+
+  async getDashboardStats() {
+    const response = await this.request('/reports/dashboard')
+    return { data: response, error: null }
   }
 
   async createContact(contactData: any) {

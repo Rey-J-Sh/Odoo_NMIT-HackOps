@@ -44,17 +44,17 @@ export default function Dashboard() {
   const fetchDashboardStats = async () => {
     try {
       // Fetch dashboard data from backend
-      const response = await apiClient.request('/reports/dashboard')
-      const data = response.data || response
+      const response = await apiClient.getDashboardStats()
+      const data = response.data
 
       setStats({
-        totalContacts: data.total_contacts || 0,
+        totalContacts: (data.contacts?.customers || 0) + (data.contacts?.vendors || 0),
         totalProducts: data.total_products || 0,
-        totalInvoices: data.total_invoices || 0,
-        totalReceivables: data.total_receivables || 0,
-        totalRevenue: data.total_revenue || 0,
-        unpaidInvoices: data.unpaid_invoices || 0,
-        overdueInvoices: data.overdue_invoices || 0
+        totalInvoices: data.pending_invoices || 0,
+        totalReceivables: data.monthly_revenue || 0,
+        totalRevenue: data.monthly_revenue || 0,
+        unpaidInvoices: data.pending_invoices || 0,
+        overdueInvoices: 0
       })
     } catch (error) {
       console.error('Error fetching dashboard stats:', error)

@@ -12,7 +12,13 @@ router.get('/', authenticateToken, async (req, res) => {
     const offset = (page - 1) * limit;
 
     let query = `
-      SELECT i.*, c.name as contact_name, c.email as contact_email 
+      SELECT i.*, 
+             json_build_object(
+               'name', c.name,
+               'email', c.email,
+               'phone', c.phone,
+               'address', c.address
+             ) as contacts
       FROM invoices i 
       LEFT JOIN contacts c ON i.contact_id = c.id 
       WHERE 1=1

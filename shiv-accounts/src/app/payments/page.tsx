@@ -37,7 +37,7 @@ export default function PaymentsPage() {
 
   const fetchPayments = async () => {
     try {
-      const response = await apiClient.from('payments').select()
+      const response = await apiClient.getPayments()
       setPayments(response.data || [])
     } catch (error) {
       console.error('Error fetching payments:', error)
