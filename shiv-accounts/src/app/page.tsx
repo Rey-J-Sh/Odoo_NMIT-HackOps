@@ -5,6 +5,7 @@ import { apiClient } from '@/lib/api'
 import DashboardMain from '@/components/DashboardMain'
 import Navigation from '@/components/Navigation'
 import ProtectedRoute from '@/components/ProtectedRoute'
+import { useAuth } from '@/contexts/AuthContext'
 import { 
   Users, 
   Package, 
@@ -26,6 +27,7 @@ interface DashboardStats {
 }
 
 export default function Dashboard() {
+  const { isAdmin } = useAuth()
   const [stats, setStats] = useState<DashboardStats>({
     totalContacts: 0,
     totalProducts: 0,
@@ -177,7 +179,8 @@ export default function Dashboard() {
             </div>
             <div className="p-6">
               <div className="space-y-4">
-                <button className="w-full text-left p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                {/* Create New Invoice - Available to all users */}
+                <a href="/invoices/create" className="block w-full text-left p-4 border rounded-lg hover:bg-gray-50 transition-colors">
                   <div className="flex items-center">
                     <FileText className="h-5 w-5 text-blue-600 mr-3" />
                     <div>
@@ -185,26 +188,36 @@ export default function Dashboard() {
                       <p className="text-sm text-gray-600">Generate a new sales invoice</p>
                     </div>
                   </div>
-                </button>
-                <button className="w-full text-left p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center">
-                    <Users className="h-5 w-5 text-green-600 mr-3" />
-                    <div>
-                      <p className="font-medium">Add New Contact</p>
-                      <p className="text-sm text-gray-600">Add customer or vendor</p>
+                </a>
+                
+                {/* Add New Contact - Admin only */}
+                {isAdmin && (
+                  <a href="/contacts" className="block w-full text-left p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                    <div className="flex items-center">
+                      <Users className="h-5 w-5 text-green-600 mr-3" />
+                      <div>
+                        <p className="font-medium">Add New Contact</p>
+                        <p className="text-sm text-gray-600">Add customer or vendor</p>
+                      </div>
                     </div>
-                  </div>
-                </button>
-                <button className="w-full text-left p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center">
-                    <Package className="h-5 w-5 text-purple-600 mr-3" />
-                    <div>
-                      <p className="font-medium">Add Product</p>
-                      <p className="text-sm text-gray-600">Add new product to catalog</p>
+                  </a>
+                )}
+                
+                {/* Add Product - Admin only */}
+                {isAdmin && (
+                  <a href="/products" className="block w-full text-left p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                    <div className="flex items-center">
+                      <Package className="h-5 w-5 text-purple-600 mr-3" />
+                      <div>
+                        <p className="font-medium">Add Product</p>
+                        <p className="text-sm text-gray-600">Add new product to catalog</p>
+                      </div>
                     </div>
-                  </div>
-                </button>
-                <button className="w-full text-left p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                  </a>
+                )}
+                
+                {/* Record Payment - Available to all users */}
+                <a href="/payments" className="block w-full text-left p-4 border rounded-lg hover:bg-gray-50 transition-colors">
                   <div className="flex items-center">
                     <CreditCard className="h-5 w-5 text-orange-600 mr-3" />
                     <div>
@@ -212,7 +225,7 @@ export default function Dashboard() {
                       <p className="text-sm text-gray-600">Record payment against invoice</p>
                     </div>
                   </div>
-                </button>
+                </a>
               </div>
             </div>
           </div>

@@ -172,15 +172,13 @@ export default function InvoicesPage() {
               <div className="text-sm text-gray-600">
                 {filteredInvoices.length} invoice{filteredInvoices.length !== 1 ? 's' : ''}
               </div>
-              {isAdmin && (
-                <a
-                  href="/invoices/create"
-                  className="btn btn-secondary"
-                >
-                  <Plus className="btn-icon" />
-                  New Invoice
-                </a>
-              )}
+              <a
+                href="/invoices/create"
+                className="btn btn-secondary"
+              >
+                <Plus className="btn-icon" />
+                New Invoice
+              </a>
             </div>
           </div>
         </div>

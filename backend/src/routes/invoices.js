@@ -129,7 +129,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
 });
 
 // Create new invoice
-router.post('/', authenticateToken, requireRole(['admin']), [
+router.post('/', authenticateToken, requireRole(['admin', 'invoicing_user']), [
   body('contact_id').isUUID(),
   body('invoice_date').isISO8601(),
   body('due_date').optional().isISO8601(),
