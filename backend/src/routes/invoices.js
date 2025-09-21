@@ -143,8 +143,10 @@ router.post('/', authenticateToken, requireRole(['admin', 'invoicing_user']), [
   body('sale_order_id').optional().isUUID()
 ], async (req, res) => {
   try {
+    console.log('Invoice creation request received:', req.body);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Validation errors:', errors.array());
       return res.status(400).json({ error: 'Validation failed', details: errors.array() });
     }
 
@@ -230,7 +232,8 @@ router.post('/', authenticateToken, requireRole(['admin', 'invoicing_user']), [
     }
   } catch (error) {
     console.error('Create invoice error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Error details:', error.message);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 });
 

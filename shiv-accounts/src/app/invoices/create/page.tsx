@@ -147,6 +147,20 @@ export default function CreateInvoicePage() {
     try {
       const { subtotal, taxAmount, total } = calculateTotals()
 
+      // Validate form data before sending
+      if (!formData.contact_id) {
+        throw new Error('Please select a customer')
+      }
+      
+      if (!formData.invoice_date) {
+        throw new Error('Please select an invoice date')
+      }
+      
+      const validLines = invoiceLines.filter(line => line.description.trim() && line.quantity > 0 && line.unit_price > 0)
+      if (validLines.length === 0) {
+        throw new Error('Please add at least one valid line item')
+      }
+
       // Create invoice with line items
       const invoiceData = {
         contact_id: formData.contact_id,
@@ -154,20 +168,32 @@ export default function CreateInvoicePage() {
         due_date: formData.due_date || null,
         status: 'draft',
         notes: formData.notes || null,
-        line_items: invoiceLines.map(line => ({
+        line_items: validLines.map(line => ({
           product_id: line.product_id || null,
-          description: line.description,
-          quantity: line.quantity,
-          unit_price: line.unit_price,
-          tax_percentage: line.tax_percentage
+          description: line.description.trim(),
+          quantity: parseFloat(line.quantity.toString()),
+          unit_price: parseFloat(line.unit_price.toString()),
+          tax_percentage: parseFloat(line.tax_percentage.toString())
         }))
       }
 
-      await apiClient.createInvoice(invoiceData)
+      console.log('Sending invoice data:', invoiceData)
+      const response = await apiClient.createInvoice(invoiceData)
+      console.log('Invoice created successfully:', response)
       router.push('/invoices')
     } catch (error) {
       console.error('Error creating invoice:', error)
-      alert('Error creating invoice. Please try again.')
+      console.error('Error details:', error)
+      
+      // Show more detailed error message
+      let errorMessage = 'Error creating invoice. Please try again.'
+      if (error instanceof Error) {
+        errorMessage = error.message
+      } else if (typeof error === 'object' && error !== null) {
+        errorMessage = JSON.stringify(error)
+      }
+      
+      alert(`Failed to create invoice: ${errorMessage}`)
     } finally {
       setSaving(false)
     }
@@ -416,7 +442,7 @@ export default function CreateInvoicePage() {
               </button>
               <button
                 type="submit"
-                disabled={saving || !formData.contact_id || invoiceLines.some(line => !line.description || line.quantity <= 0 || line.unit_price <= 0)}
+                disabled={saving || !formData.contact_id || invoiceLines.some(line => !line.description.trim() || line.quantity <= 0 || line.unit_price <= 0)}
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {saving ? 'Creating Invoice...' : 'Create Invoice'}

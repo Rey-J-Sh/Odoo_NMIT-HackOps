@@ -224,11 +224,18 @@ class ApiClient {
   }
 
   async createInvoice(invoiceData: any) {
-    const response = await this.request('/invoices', {
-      method: 'POST',
-      body: JSON.stringify(invoiceData),
-    })
-    return { data: response, error: null }
+    try {
+      console.log('API Client: Creating invoice with data:', invoiceData)
+      const response = await this.request('/invoices', {
+        method: 'POST',
+        body: JSON.stringify(invoiceData),
+      })
+      console.log('API Client: Invoice created successfully:', response)
+      return { data: response, error: null }
+    } catch (error) {
+      console.error('API Client: Error creating invoice:', error)
+      throw error
+    }
   }
 
   async createPayment(paymentData: any) {
