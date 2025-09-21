@@ -5,7 +5,8 @@ import { apiClient } from '@/lib/api'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import DashboardProducts from '@/components/DashboardProducts'
 import Pagination from '@/components/Pagination'
-import { Edit, Trash2, Search, Package, Plus } from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
+import { Edit, Trash2, Search, Package, Plus, Eye } from 'lucide-react'
 import '@/styles/dashboard.css'
 
 interface Product {
@@ -21,6 +22,7 @@ interface Product {
 }
 
 export default function ProductsPage() {
+  const { isAdmin } = useAuth()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -164,13 +166,15 @@ export default function ProductsPage() {
               <div className="text-sm text-gray-600">
                 {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''}
               </div>
-              <button
-                onClick={() => setShowModal(true)}
-                className="btn btn-secondary"
-              >
-                <Plus className="btn-icon" />
-                Add New Product
-              </button>
+              {isAdmin && (
+                <button
+                  onClick={() => setShowModal(true)}
+                  className="btn btn-secondary"
+                >
+                  <Plus className="btn-icon" />
+                  Add New Product
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -198,17 +202,29 @@ export default function ProductsPage() {
                 </div>
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => handleEdit(product)}
                     className="text-gray-400 hover:text-blue-600 transition-colors"
+                    title="View Product"
                   >
-                    <Edit className="h-4 w-4" />
+                    <Eye className="h-4 w-4" />
                   </button>
-                  <button
-                    onClick={() => handleDelete(product.id)}
-                    className="text-gray-400 hover:text-red-600 transition-colors"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+                  {isAdmin && (
+                    <>
+                      <button
+                        onClick={() => handleEdit(product)}
+                        className="text-gray-400 hover:text-blue-600 transition-colors"
+                        title="Edit Product"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(product.id)}
+                        className="text-gray-400 hover:text-red-600 transition-colors"
+                        title="Delete Product"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
               
@@ -241,13 +257,15 @@ export default function ProductsPage() {
             <p className="text-gray-600 mb-4">
               {searchTerm ? 'Try adjusting your search terms.' : 'Get started by adding your first product.'}
             </p>
-            <button
-              onClick={() => setShowModal(true)}
-              className="btn btn-secondary"
-            >
-              <Plus className="btn-icon" />
-              Add New Product
-            </button>
+            {isAdmin && (
+              <button
+                onClick={() => setShowModal(true)}
+                className="btn btn-secondary"
+              >
+                <Plus className="btn-icon" />
+                Add New Product
+              </button>
+            )}
           </div>
         )}
 

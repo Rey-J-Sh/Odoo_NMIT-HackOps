@@ -1,7 +1,7 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const pool = require('../config/database');
-const { authenticateToken } = require('../middleware/auth');
+const { authenticateToken, requireRole } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -106,7 +106,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
 });
 
 // Create new payment
-router.post('/', authenticateToken, [
+router.post('/', authenticateToken, requireRole(['admin']), [
   body('invoice_id').isUUID(),
   body('contact_id').isUUID(),
   body('payment_date').isISO8601(),
@@ -197,7 +197,7 @@ router.post('/', authenticateToken, [
 });
 
 // Update payment
-router.put('/:id', authenticateToken, [
+router.put('/:id', authenticateToken, requireRole(['admin']), [
   body('payment_date').optional().isISO8601(),
   body('amount').optional().isFloat({ min: 0.01 }),
   body('payment_method').optional().isIn(['cash', 'bank_transfer', 'cheque', 'card']),
@@ -280,7 +280,7 @@ router.put('/:id', authenticateToken, [
 });
 
 // Delete payment
-router.delete('/:id', authenticateToken, async (req, res) => {
+router.delete('/:id', authenticateToken, requireRole(['admin']), async (req, res) => {
   try {
     const { id } = req.params;
 

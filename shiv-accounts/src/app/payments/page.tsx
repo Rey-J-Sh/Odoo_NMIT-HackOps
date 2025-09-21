@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react'
 import { apiClient } from '@/lib/api'
 import ProtectedRoute from '@/components/ProtectedRoute'
-import { Edit, Eye, Search, CreditCard, Plus, Calendar, DollarSign } from 'lucide-react'
+import Navigation from '@/components/Navigation'
+import { useAuth } from '@/contexts/AuthContext'
+import { Edit, Eye, Search, CreditCard, Plus, Calendar, DollarSign, Trash2 } from 'lucide-react'
 import { format } from 'date-fns'
 import '@/styles/dashboard.css'
 
@@ -23,6 +25,7 @@ interface Payment {
 }
 
 export default function PaymentsPage() {
+  const { isAdmin } = useAuth()
   const [payments, setPayments] = useState<Payment[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -98,6 +101,8 @@ export default function PaymentsPage() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        
         {/* Header */}
         <div className="bg-white shadow-sm border-b">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -106,10 +111,12 @@ export default function PaymentsPage() {
                 <h1 className="text-2xl font-bold text-gray-900">Payments</h1>
                 <p className="text-gray-600">Manage customer payments</p>
               </div>
-              <button className="btn btn-secondary">
-                <Plus className="btn-icon" />
-                Record Payment
-              </button>
+              {isAdmin && (
+                <button className="btn btn-secondary">
+                  <Plus className="btn-icon" />
+                  Record Payment
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -199,12 +206,19 @@ export default function PaymentsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-2">
-                          <button className="text-blue-600 hover:text-blue-900">
+                          <button className="text-blue-600 hover:text-blue-900" title="View Payment">
                             <Eye className="h-4 w-4" />
                           </button>
-                          <button className="text-gray-600 hover:text-gray-900">
-                            <Edit className="h-4 w-4" />
-                          </button>
+                          {isAdmin && (
+                            <>
+                              <button className="text-gray-600 hover:text-gray-900" title="Edit Payment">
+                                <Edit className="h-4 w-4" />
+                              </button>
+                              <button className="text-red-600 hover:text-red-900" title="Delete Payment">
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </>
+                          )}
                         </div>
                       </td>
                     </tr>

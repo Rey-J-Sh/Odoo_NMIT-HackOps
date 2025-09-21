@@ -88,7 +88,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
 });
 
 // Create new contact
-router.post('/', authenticateToken, [
+router.post('/', authenticateToken, requireRole(['admin']), [
   body('name').trim().isLength({ min: 2 }),
   body('email').optional().isEmail().normalizeEmail(),
   body('phone').optional().trim(),
@@ -128,7 +128,7 @@ router.post('/', authenticateToken, [
 });
 
 // Update contact
-router.put('/:id', authenticateToken, [
+router.put('/:id', authenticateToken, requireRole(['admin']), [
   body('name').optional().trim().isLength({ min: 2 }),
   body('email').optional().isEmail().normalizeEmail(),
   body('phone').optional().trim(),

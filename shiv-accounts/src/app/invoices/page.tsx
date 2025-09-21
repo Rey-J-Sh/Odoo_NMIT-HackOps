@@ -5,7 +5,8 @@ import { apiClient } from '@/lib/api'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import DashboardInvoices from '@/components/DashboardInvoices'
 import Pagination from '@/components/Pagination'
-import { Edit, Eye, Search, FileText, CreditCard, Plus } from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
+import { Edit, Eye, Search, FileText, CreditCard, Plus, Trash2 } from 'lucide-react'
 import { format } from 'date-fns'
 import PaymentModal from '@/components/PaymentModal'
 import '@/styles/dashboard.css'
@@ -30,6 +31,7 @@ interface Invoice {
 }
 
 export default function InvoicesPage() {
+  const { isAdmin } = useAuth()
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -170,13 +172,15 @@ export default function InvoicesPage() {
               <div className="text-sm text-gray-600">
                 {filteredInvoices.length} invoice{filteredInvoices.length !== 1 ? 's' : ''}
               </div>
-              <a
-                href="/invoices/create"
-                className="btn btn-secondary"
-              >
-                <Plus className="btn-icon" />
-                New Invoice
-              </a>
+              {isAdmin && (
+                <a
+                  href="/invoices/create"
+                  className="btn btn-secondary"
+                >
+                  <Plus className="btn-icon" />
+                  New Invoice
+                </a>
+              )}
             </div>
           </div>
         </div>
@@ -251,12 +255,19 @@ export default function InvoicesPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
-                        <button className="text-blue-600 hover:text-blue-900">
+                        <button className="text-blue-600 hover:text-blue-900" title="View Invoice">
                           <Eye className="h-4 w-4" />
                         </button>
-                        <button className="text-gray-600 hover:text-gray-900">
-                          <Edit className="h-4 w-4" />
-                        </button>
+                        {isAdmin && (
+                          <>
+                            <button className="text-gray-600 hover:text-gray-900" title="Edit Invoice">
+                              <Edit className="h-4 w-4" />
+                            </button>
+                            <button className="text-red-600 hover:text-red-900" title="Delete Invoice">
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </>
+                        )}
                         {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
                           <button
                             onClick={() => handleRecordPayment(invoice)}

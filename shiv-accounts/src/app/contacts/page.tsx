@@ -5,7 +5,8 @@ import { apiClient } from '@/lib/api'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import DashboardContacts from '@/components/DashboardContacts'
 import Pagination from '@/components/Pagination'
-import { Edit, Trash2, Search, Users, Building, Plus } from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
+import { Edit, Trash2, Search, Users, Building, Plus, Eye } from 'lucide-react'
 import '@/styles/dashboard.css'
 
 interface Contact {
@@ -20,6 +21,7 @@ interface Contact {
 }
 
 export default function ContactsPage() {
+  const { isAdmin } = useAuth()
   const [contacts, setContacts] = useState<Contact[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -159,13 +161,15 @@ export default function ContactsPage() {
               <div className="text-sm text-gray-600">
                 {filteredContacts.length} contact{filteredContacts.length !== 1 ? 's' : ''}
               </div>
-              <button
-                onClick={() => setShowModal(true)}
-                className="btn btn-secondary"
-              >
-                <Plus className="btn-icon" />
-                Add New Contact
-              </button>
+              {isAdmin && (
+                <button
+                  onClick={() => setShowModal(true)}
+                  className="btn btn-secondary"
+                >
+                  <Plus className="btn-icon" />
+                  Add New Contact
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -194,17 +198,29 @@ export default function ContactsPage() {
                 </div>
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => handleEdit(contact)}
                     className="text-gray-400 hover:text-blue-600 transition-colors"
+                    title="View Contact"
                   >
-                    <Edit className="h-4 w-4" />
+                    <Eye className="h-4 w-4" />
                   </button>
-                  <button
-                    onClick={() => handleDelete(contact.id)}
-                    className="text-gray-400 hover:text-red-600 transition-colors"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+                  {isAdmin && (
+                    <>
+                      <button
+                        onClick={() => handleEdit(contact)}
+                        className="text-gray-400 hover:text-blue-600 transition-colors"
+                        title="Edit Contact"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(contact.id)}
+                        className="text-gray-400 hover:text-red-600 transition-colors"
+                        title="Delete Contact"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
               
@@ -236,13 +252,15 @@ export default function ContactsPage() {
             <p className="text-gray-600 mb-4">
               {searchTerm ? 'Try adjusting your search terms.' : 'Get started by adding your first contact.'}
             </p>
-            <button
-              onClick={() => setShowModal(true)}
-              className="btn btn-secondary"
-            >
-              <Plus className="btn-icon" />
-              Add New Contact
-            </button>
+            {isAdmin && (
+              <button
+                onClick={() => setShowModal(true)}
+                className="btn btn-secondary"
+              >
+                <Plus className="btn-icon" />
+                Add New Contact
+              </button>
+            )}
           </div>
         )}
 

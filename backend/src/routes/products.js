@@ -76,7 +76,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
 });
 
 // Create new product
-router.post('/', authenticateToken, [
+router.post('/', authenticateToken, requireRole(['admin']), [
   body('sku').trim().isLength({ min: 1 }),
   body('name').trim().isLength({ min: 2 }),
   body('price').isFloat({ min: 0 }),
@@ -115,7 +115,7 @@ router.post('/', authenticateToken, [
 });
 
 // Update product
-router.put('/:id', authenticateToken, [
+router.put('/:id', authenticateToken, requireRole(['admin']), [
   body('sku').optional().trim().isLength({ min: 1 }),
   body('name').optional().trim().isLength({ min: 2 }),
   body('price').optional().isFloat({ min: 0 }),

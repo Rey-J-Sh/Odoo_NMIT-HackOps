@@ -129,7 +129,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
 });
 
 // Create new invoice
-router.post('/', authenticateToken, [
+router.post('/', authenticateToken, requireRole(['admin']), [
   body('contact_id').isUUID(),
   body('invoice_date').isISO8601(),
   body('due_date').optional().isISO8601(),
@@ -235,7 +235,7 @@ router.post('/', authenticateToken, [
 });
 
 // Update invoice
-router.put('/:id', authenticateToken, [
+router.put('/:id', authenticateToken, requireRole(['admin']), [
   body('contact_id').optional().isUUID(),
   body('invoice_date').optional().isISO8601(),
   body('due_date').optional().isISO8601(),
