@@ -1,3 +1,9 @@
+Submission Video Link: https://drive.google.com/file/d/1rKuoQRgbW7bORsxV-ZF5R2P1hYtUNt5p/view?usp=drive_link
+
+
+
+
+
 Shiv Accounts Cloud - Complete Accounting System
 
 A comprehensive cloud-based accounting system built with Next.js frontend and Node.js backend, featuring complete purchase/sales workflows, financial reporting, role-based access control, and Razorpay payment integration.
