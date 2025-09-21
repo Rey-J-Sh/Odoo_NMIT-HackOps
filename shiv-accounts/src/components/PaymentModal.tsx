@@ -53,15 +53,15 @@ export default function PaymentModal({
     setLoading(true)
 
     try {
-      // Get contact ID from invoice
-      const invoiceResponse = await apiClient.from('invoices').select().eq('id', invoiceId).single()
+      // Get invoice details to get contact_id
+      const invoiceResponse = await apiClient.request(`/invoices/${invoiceId}`)
       
-      if (!invoiceResponse.data) throw new Error('Invoice not found')
+      if (!invoiceResponse) throw new Error('Invoice not found')
 
-      // Insert payment
-      await apiClient.createPayment({
+      // Create payment
+      const paymentResponse = await apiClient.createPayment({
         invoice_id: invoiceId,
-        contact_id: invoiceResponse.data.contact_id,
+        contact_id: invoiceResponse.contact_id,
         payment_date: formData.payment_date,
         amount: parseFloat(formData.amount),
         payment_method: formData.payment_method,

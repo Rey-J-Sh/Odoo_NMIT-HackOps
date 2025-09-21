@@ -403,6 +403,26 @@ export default function CreateInvoicePage() {
               </div>
             </div>
           </div>
+
+          {/* Submit Button */}
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="flex justify-end space-x-4">
+              <button
+                type="button"
+                onClick={() => router.push('/invoices')}
+                className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={saving || !formData.contact_id || invoiceLines.some(line => !line.description || line.quantity <= 0 || line.unit_price <= 0)}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {saving ? 'Creating Invoice...' : 'Create Invoice'}
+              </button>
+            </div>
+          </div>
         </form>
         </main>
       </div>
