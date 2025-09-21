@@ -5,7 +5,6 @@ import { apiClient } from '@/lib/api'
 import DashboardMain from '@/components/DashboardMain'
 import Navigation from '@/components/Navigation'
 import ProtectedRoute from '@/components/ProtectedRoute'
-import AuthDebug from '@/components/AuthDebug'
 import { 
   Users, 
   Package, 
@@ -44,48 +43,31 @@ export default function Dashboard() {
 
   const fetchDashboardStats = async () => {
     try {
-      // Fetch contacts count
-      const contactsResponse = await apiClient.request('/contacts?limit=1')
-      const contactsCount = contactsResponse.pagination?.total || 0
-
-      // Fetch products count
-      const productsResponse = await apiClient.request('/products?limit=1')
-      const productsCount = productsResponse.pagination?.total || 0
-
-      // Fetch invoices count
-      const invoicesResponse = await apiClient.request('/invoices?limit=1')
-      const invoicesCount = invoicesResponse.pagination?.total || 0
-
-      // Fetch total receivables (open + partially paid invoices)
-      const receivablesResponse = await apiClient.request('/invoices?status=open,partially_paid')
-      const totalReceivables = receivablesResponse.invoices?.reduce((sum: number, invoice: any) => 
-        sum + (invoice.total_amount - invoice.paid_amount), 0) || 0
-
-      // Fetch total revenue (paid invoices)
-      const revenueResponse = await apiClient.request('/invoices?status=paid')
-      const totalRevenue = revenueResponse.invoices?.reduce((sum: number, invoice: any) => 
-        sum + invoice.total_amount, 0) || 0
-
-      // Fetch unpaid invoices count
-      const unpaidResponse = await apiClient.request('/invoices?status=open,partially_paid&limit=1')
-      const unpaidCount = unpaidResponse.pagination?.total || 0
-
-      // Fetch overdue invoices count
-      const today = new Date().toISOString().split('T')[0]
-      const overdueResponse = await apiClient.request(`/invoices?status=open,partially_paid&due_date_lt=${today}&limit=1`)
-      const overdueCount = overdueResponse.pagination?.total || 0
+      // Fetch dashboard data from backend
+      const response = await apiClient.request('/reports/dashboard')
+      const data = response.data || response
 
       setStats({
-        totalContacts: contactsCount,
-        totalProducts: productsCount,
-        totalInvoices: invoicesCount,
-        totalReceivables,
-        totalRevenue,
-        unpaidInvoices: unpaidCount,
-        overdueInvoices: overdueCount
+        totalContacts: data.total_contacts || 0,
+        totalProducts: data.total_products || 0,
+        totalInvoices: data.total_invoices || 0,
+        totalReceivables: data.total_receivables || 0,
+        totalRevenue: data.total_revenue || 0,
+        unpaidInvoices: data.unpaid_invoices || 0,
+        overdueInvoices: data.overdue_invoices || 0
       })
     } catch (error) {
       console.error('Error fetching dashboard stats:', error)
+      // Fallback to basic data
+      setStats({
+        totalContacts: 0,
+        totalProducts: 0,
+        totalInvoices: 0,
+        totalReceivables: 0,
+        totalRevenue: 0,
+        unpaidInvoices: 0,
+        overdueInvoices: 0
+      })
     } finally {
       setLoading(false)
     }
@@ -147,7 +129,6 @@ export default function Dashboard() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
-        <AuthDebug />
         <Navigation />
         
         <DashboardMain 

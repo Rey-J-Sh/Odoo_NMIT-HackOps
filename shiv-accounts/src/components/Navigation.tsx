@@ -14,7 +14,10 @@ import {
   BarChart3,
   LogOut,
   User,
-  ChevronDown
+  ChevronDown,
+  ShoppingCart,
+  Receipt,
+  FileCheck
 } from 'lucide-react'
 
 interface NavItem {
@@ -28,6 +31,9 @@ const navigation: NavItem[] = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard, roles: ['admin', 'invoicing_user'] },
   { name: 'Contacts', href: '/contacts', icon: Users, roles: ['admin', 'invoicing_user'] },
   { name: 'Products', href: '/products', icon: Package, roles: ['admin', 'invoicing_user'] },
+  { name: 'Purchase Orders', href: '/purchase-orders', icon: ShoppingCart, roles: ['admin', 'invoicing_user'] },
+  { name: 'Vendor Bills', href: '/vendor-bills', icon: Receipt, roles: ['admin', 'invoicing_user'] },
+  { name: 'Sale Orders', href: '/sale-orders', icon: FileCheck, roles: ['admin', 'invoicing_user'] },
   { name: 'Invoices', href: '/invoices', icon: FileText, roles: ['admin', 'invoicing_user'] },
   { name: 'Payments', href: '/payments', icon: CreditCard, roles: ['admin', 'invoicing_user'] },
   { name: 'Ledger', href: '/ledger', icon: BookOpen, roles: ['admin', 'invoicing_user'] },

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { apiClient } from '@/lib/api'
+import ProtectedRoute from '@/components/ProtectedRoute'
 import DashboardInvoiceCreate from '@/components/DashboardInvoiceCreate'
 import { Plus, Minus, User, Package } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -65,15 +66,11 @@ export default function CreateInvoicePage() {
 
   const fetchContacts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('contacts')
-        .select('id, name, email, contact_type')
-        .eq('contact_type', 'customer')
-        .eq('is_active', true)
-        .order('name')
-
-      if (error) throw error
-      setContacts(data || [])
+      const response = await apiClient.getContacts()
+      const customerContacts = response.data?.filter(contact => 
+        contact.contact_type === 'customer' && contact.is_active
+      ) || []
+      setContacts(customerContacts)
     } catch (error) {
       console.error('Error fetching contacts:', error)
     }
@@ -81,14 +78,9 @@ export default function CreateInvoicePage() {
 
   const fetchProducts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('id, sku, name, price, tax_percentage')
-        .eq('is_active', true)
-        .order('name')
-
-      if (error) throw error
-      setProducts(data || [])
+      const response = await apiClient.getProducts()
+      const activeProducts = response.data?.filter(product => product.is_active) || []
+      setProducts(activeProducts)
     } catch (error) {
       console.error('Error fetching products:', error)
     } finally {
@@ -153,54 +145,25 @@ export default function CreateInvoicePage() {
     setSaving(true)
 
     try {
-      // Generate invoice number
-      const { data: lastInvoice } = await supabase
-        .from('invoices')
-        .select('invoice_number')
-        .order('created_at', { ascending: false })
-        .limit(1)
-
-      const lastNumber = lastInvoice?.[0]?.invoice_number || 'INV-2024-000'
-      const nextNumber = `INV-2024-${String(parseInt(lastNumber.split('-')[2]) + 1).padStart(3, '0')}`
-
       const { subtotal, taxAmount, total } = calculateTotals()
 
-      // Create invoice
-      const { data: invoice, error: invoiceError } = await supabase
-        .from('invoices')
-        .insert([{
-          invoice_number: nextNumber,
-          contact_id: formData.contact_id,
-          invoice_date: formData.invoice_date,
-          due_date: formData.due_date || null,
-          status: 'draft',
-          subtotal,
-          tax_amount: taxAmount,
-          total_amount: total,
-          notes: formData.notes || null
-        }])
-        .select()
-        .single()
+      // Create invoice with line items
+      const invoiceData = {
+        contact_id: formData.contact_id,
+        invoice_date: formData.invoice_date,
+        due_date: formData.due_date || null,
+        status: 'draft',
+        notes: formData.notes || null,
+        line_items: invoiceLines.map(line => ({
+          product_id: line.product_id || null,
+          description: line.description,
+          quantity: line.quantity,
+          unit_price: line.unit_price,
+          tax_percentage: line.tax_percentage
+        }))
+      }
 
-      if (invoiceError) throw invoiceError
-
-      // Create invoice lines
-      const linesToInsert = invoiceLines.map(line => ({
-        invoice_id: invoice.id,
-        product_id: line.product_id || null,
-        description: line.description,
-        quantity: line.quantity,
-        unit_price: line.unit_price,
-        tax_percentage: line.tax_percentage,
-        line_total: line.line_total
-      }))
-
-      const { error: linesError } = await supabase
-        .from('invoice_lines')
-        .insert(linesToInsert)
-
-      if (linesError) throw linesError
-
+      await apiClient.createInvoice(invoiceData)
       router.push('/invoices')
     } catch (error) {
       console.error('Error creating invoice:', error)
@@ -221,11 +184,12 @@ export default function CreateInvoicePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <DashboardInvoiceCreate 
-        title="Create Invoice" 
-        subtitle="Create a new sales invoice"
-      />
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50">
+        <DashboardInvoiceCreate 
+          title="Create Invoice" 
+          subtitle="Create a new sales invoice"
+        />
 
       {/* Main Content */}
       <main className="dashboard-main">
@@ -440,7 +404,8 @@ export default function CreateInvoicePage() {
             </div>
           </div>
         </form>
-      </main>
-    </div>
+        </main>
+      </div>
+    </ProtectedRoute>
   )
 }

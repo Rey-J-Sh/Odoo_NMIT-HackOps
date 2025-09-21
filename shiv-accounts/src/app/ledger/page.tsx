@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { apiClient } from '@/lib/api'
+import ProtectedRoute from '@/components/ProtectedRoute'
 import DashboardLedger from '@/components/DashboardLedger'
 import Pagination from '@/components/Pagination'
 import { Search, Filter, BookOpen, Calendar, Download } from 'lucide-react'
@@ -39,31 +40,10 @@ export default function LedgerPage() {
 
   const fetchLedgerEntries = useCallback(async () => {
     try {
-      let query = supabase
-        .from('ledger_entries')
-        .select(`
-          *,
-          accounts:account_id (
-            code,
-            name,
-            type
-          )
-        `)
-        .order('entry_date', { ascending: false })
-        .order('created_at', { ascending: false })
-
-      // Apply date filters
-      if (dateFrom) {
-        query = query.gte('entry_date', dateFrom)
-      }
-      if (dateTo) {
-        query = query.lte('entry_date', dateTo)
-      }
-
-      const { data, error } = await query
-
-      if (error) throw error
-      setLedgerEntries(data || [])
+      // For now, we'll fetch all entries and filter on the client side
+      // In a real app, you'd want to implement server-side filtering
+      const response = await apiClient.getLedgerEntries()
+      setLedgerEntries(response.data || [])
     } catch (error) {
       console.error('Error fetching ledger entries:', error)
     } finally {
@@ -161,11 +141,12 @@ export default function LedgerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <DashboardLedger 
-        title="General Ledger" 
-        subtitle="Double-entry bookkeeping records"
-      />
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50">
+        <DashboardLedger 
+          title="General Ledger" 
+          subtitle="Double-entry bookkeeping records"
+        />
 
       {/* Main Content */}
       <main className="dashboard-main">
@@ -368,7 +349,8 @@ export default function LedgerPage() {
             itemsPerPage={itemsPerPage}
           />
         )}
-      </main>
-    </div>
+        </main>
+      </div>
+    </ProtectedRoute>
   )
 }

@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
@@ -10,7 +10,7 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
-  const { user, profile, loading } = useAuth()
+  const { user, loading } = useAuth()
   const router = useRouter()
 
   useEffect(() => {
@@ -19,18 +19,18 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
         router.push('/login')
         return
       }
-
-      if (requiredRole && profile?.role !== requiredRole) {
+      
+      if (requiredRole && user.role !== requiredRole) {
         router.push('/unauthorized')
         return
       }
     }
-  }, [user, profile, loading, requiredRole, router])
+  }, [user, loading, requiredRole, router])
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
       </div>
     )
   }
@@ -39,10 +39,9 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
     return null
   }
 
-  if (requiredRole && profile?.role !== requiredRole) {
+  if (requiredRole && user.role !== requiredRole) {
     return null
   }
 
   return <>{children}</>
 }
-

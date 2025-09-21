@@ -53,40 +53,21 @@ export default function PaymentModal({
     setLoading(true)
 
     try {
-      // Generate payment number
-      const { data: lastPayment } = await supabase
-        .from('payments')
-        .select('payment_number')
-        .order('created_at', { ascending: false })
-        .limit(1)
-
-      const lastNumber = lastPayment?.[0]?.payment_number || 'PAY-2024-000'
-      const nextNumber = `PAY-2024-${String(parseInt(lastNumber.split('-')[2]) + 1).padStart(3, '0')}`
-
       // Get contact ID from invoice
-      const { data: invoice } = await supabase
-        .from('invoices')
-        .select('contact_id')
-        .eq('id', invoiceId)
-        .single()
-
-      if (!invoice) throw new Error('Invoice not found')
+      const invoiceResponse = await apiClient.from('invoices').select().eq('id', invoiceId).single()
+      
+      if (!invoiceResponse.data) throw new Error('Invoice not found')
 
       // Insert payment
-      const { error } = await supabase
-        .from('payments')
-        .insert([{
-          payment_number: nextNumber,
-          invoice_id: invoiceId,
-          contact_id: invoice.contact_id,
-          payment_date: formData.payment_date,
-          amount: parseFloat(formData.amount),
-          payment_method: formData.payment_method,
-          reference: formData.reference || null,
-          notes: formData.notes || null
-        }])
-
-      if (error) throw error
+      await apiClient.createPayment({
+        invoice_id: invoiceId,
+        contact_id: invoiceResponse.data.contact_id,
+        payment_date: formData.payment_date,
+        amount: parseFloat(formData.amount),
+        payment_method: formData.payment_method,
+        reference: formData.reference || null,
+        notes: formData.notes || null
+      })
 
       onPaymentRecorded()
       onClose()

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { apiClient } from '@/lib/api'
+import ProtectedRoute from '@/components/ProtectedRoute'
 import DashboardReports from '@/components/DashboardReports'
 import { TrendingUp, DollarSign, FileText, Calendar } from 'lucide-react'
 import '@/styles/dashboard.css'
@@ -32,37 +33,29 @@ export default function ReportsPage() {
 
   const fetchReportData = async () => {
     try {
-      // Fetch all invoices data
-      const invoicesResponse = await apiClient.request('/invoices')
-      const allInvoices = invoicesResponse.invoices || []
-
-      // Calculate metrics from the data
-      const totalRevenue = allInvoices
-        .filter(invoice => invoice.status === 'paid')
-        .reduce((sum, invoice) => sum + invoice.total_amount, 0)
-
-      const totalReceivables = allInvoices
-        .filter(invoice => ['open', 'partially_paid'].includes(invoice.status))
-        .reduce((sum, invoice) => sum + (invoice.total_amount - invoice.paid_amount), 0)
-
-      const totalInvoices = allInvoices.length
-      const paidInvoices = allInvoices.filter(invoice => invoice.status === 'paid').length
-      const unpaidInvoices = allInvoices.filter(invoice => ['open', 'partially_paid'].includes(invoice.status)).length
-
-      const averageInvoiceValue = allInvoices.length 
-        ? allInvoices.reduce((sum, invoice) => sum + invoice.total_amount, 0) / allInvoices.length
-        : 0
+      // Fetch dashboard data from backend
+      const response = await apiClient.request('/reports/dashboard')
+      const data = response.data || response
 
       setReportData({
-        totalRevenue,
-        totalReceivables,
-        totalInvoices,
-        paidInvoices,
-        unpaidInvoices,
-        averageInvoiceValue
+        totalRevenue: data.total_revenue || 0,
+        totalReceivables: data.total_receivables || 0,
+        totalInvoices: data.total_invoices || 0,
+        paidInvoices: data.paid_invoices || 0,
+        unpaidInvoices: data.unpaid_invoices || 0,
+        averageInvoiceValue: data.average_invoice_value || 0
       })
     } catch (error) {
       console.error('Error fetching report data:', error)
+      // Fallback to basic data
+      setReportData({
+        totalRevenue: 0,
+        totalReceivables: 0,
+        totalInvoices: 0,
+        paidInvoices: 0,
+        unpaidInvoices: 0,
+        averageInvoiceValue: 0
+      })
     } finally {
       setLoading(false)
     }
@@ -104,14 +97,15 @@ This is a basic report. More detailed reports will be available in future versio
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <DashboardReports 
-        title="Reports" 
-        subtitle="Financial reports and analytics"
-      />
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50">
+        <DashboardReports 
+          title="Reports" 
+          subtitle="Financial reports and analytics"
+        />
 
-      {/* Main Content */}
-      <main className="dashboard-main">
+        {/* Main Content */}
+        <main className="dashboard-main">
         {/* Financial Summary */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -203,7 +197,8 @@ This is a basic report. More detailed reports will be available in future versio
             <li>• Tax Reports</li>
           </ul>
         </div>
-      </main>
-    </div>
+        </main>
+      </div>
+    </ProtectedRoute>
   )
 }

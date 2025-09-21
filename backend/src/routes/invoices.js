@@ -133,7 +133,8 @@ router.post('/', authenticateToken, [
   body('line_items.*.description').trim().isLength({ min: 1 }),
   body('line_items.*.quantity').isFloat({ min: 0.01 }),
   body('line_items.*.unit_price').isFloat({ min: 0 }),
-  body('line_items.*.tax_percentage').optional().isFloat({ min: 0, max: 100 })
+  body('line_items.*.tax_percentage').optional().isFloat({ min: 0, max: 100 }),
+  body('sale_order_id').optional().isUUID()
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -141,7 +142,7 @@ router.post('/', authenticateToken, [
       return res.status(400).json({ error: 'Validation failed', details: errors.array() });
     }
 
-    const { contact_id, invoice_date, due_date, status = 'draft', notes, line_items } = req.body;
+    const { contact_id, invoice_date, due_date, status = 'draft', notes, line_items, sale_order_id } = req.body;
 
     // Verify contact exists
     const contactResult = await pool.query(
@@ -151,6 +152,18 @@ router.post('/', authenticateToken, [
 
     if (contactResult.rows.length === 0) {
       return res.status(400).json({ error: 'Contact not found' });
+    }
+
+    // Verify sale order exists if provided
+    if (sale_order_id) {
+      const saleOrderResult = await pool.query(
+        'SELECT id FROM sale_orders WHERE id = $1',
+        [sale_order_id]
+      );
+
+      if (saleOrderResult.rows.length === 0) {
+        return res.status(400).json({ error: 'Sale order not found' });
+      }
     }
 
     // Generate invoice number
@@ -166,8 +179,8 @@ router.post('/', authenticateToken, [
 
       // Create invoice
       const invoiceResult = await client.query(
-        'INSERT INTO invoices (invoice_number, contact_id, invoice_date, due_date, status, notes) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-        [invoiceNumber, contact_id, invoice_date, due_date, status, notes]
+        'INSERT INTO invoices (invoice_number, contact_id, sale_order_id, invoice_date, due_date, status, notes) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+        [invoiceNumber, contact_id, sale_order_id, invoice_date, due_date, status, notes]
       );
 
       const invoice = invoiceResult.rows[0];
@@ -221,7 +234,8 @@ router.put('/:id', authenticateToken, [
   body('invoice_date').optional().isISO8601(),
   body('due_date').optional().isISO8601(),
   body('status').optional().isIn(['draft', 'open', 'partially_paid', 'paid', 'cancelled']),
-  body('notes').optional().trim()
+  body('notes').optional().trim(),
+  body('sale_order_id').optional().isUUID()
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -230,7 +244,7 @@ router.put('/:id', authenticateToken, [
     }
 
     const { id } = req.params;
-    const { contact_id, invoice_date, due_date, status, notes } = req.body;
+    const { contact_id, invoice_date, due_date, status, notes, sale_order_id } = req.body;
 
     // Check if invoice exists
     const existingInvoice = await pool.query(
@@ -251,6 +265,18 @@ router.put('/:id', authenticateToken, [
 
       if (contactResult.rows.length === 0) {
         return res.status(400).json({ error: 'Contact not found' });
+      }
+    }
+
+    // Verify sale order exists if provided
+    if (sale_order_id) {
+      const saleOrderResult = await pool.query(
+        'SELECT id FROM sale_orders WHERE id = $1',
+        [sale_order_id]
+      );
+
+      if (saleOrderResult.rows.length === 0) {
+        return res.status(400).json({ error: 'Sale order not found' });
       }
     }
 
@@ -285,6 +311,12 @@ router.put('/:id', authenticateToken, [
     if (notes !== undefined) {
       updates.push(`notes = $${paramCount}`);
       values.push(notes);
+      paramCount++;
+    }
+
+    if (sale_order_id !== undefined) {
+      updates.push(`sale_order_id = $${paramCount}`);
+      values.push(sale_order_id);
       paramCount++;
     }
 

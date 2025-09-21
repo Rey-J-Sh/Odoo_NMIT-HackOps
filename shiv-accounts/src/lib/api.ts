@@ -145,48 +145,94 @@ class ApiClient {
       })
     }
   }
+
+  // Direct API methods for better control
+  async getContacts() {
+    const response = await this.request('/contacts')
+    return { data: response.contacts || response, error: null }
+  }
+
+  async getProducts() {
+    const response = await this.request('/products')
+    return { data: response.products || response, error: null }
+  }
+
+  async getInvoices() {
+    const response = await this.request('/invoices')
+    return { data: response.invoices || response, error: null }
+  }
+
+  async getLedgerEntries() {
+    const response = await this.request('/ledger_entries')
+    return { data: response.ledger_entries || response, error: null }
+  }
+
+  async createContact(contactData: any) {
+    const response = await this.request('/contacts', {
+      method: 'POST',
+      body: JSON.stringify(contactData),
+    })
+    return { data: response, error: null }
+  }
+
+  async updateContact(id: string, contactData: any) {
+    const response = await this.request(`/contacts/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(contactData),
+    })
+    return { data: response, error: null }
+  }
+
+  async deleteContact(id: string) {
+    await this.request(`/contacts/${id}`, {
+      method: 'DELETE',
+    })
+    return { data: null, error: null }
+  }
+
+  async createProduct(productData: any) {
+    const response = await this.request('/products', {
+      method: 'POST',
+      body: JSON.stringify(productData),
+    })
+    return { data: response, error: null }
+  }
+
+  async updateProduct(id: string, productData: any) {
+    const response = await this.request(`/products/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(productData),
+    })
+    return { data: response, error: null }
+  }
+
+  async deleteProduct(id: string) {
+    await this.request(`/products/${id}`, {
+      method: 'DELETE',
+    })
+    return { data: null, error: null }
+  }
+
+  async createInvoice(invoiceData: any) {
+    const response = await this.request('/invoices', {
+      method: 'POST',
+      body: JSON.stringify(invoiceData),
+    })
+    return { data: response, error: null }
+  }
+
+  async createPayment(paymentData: any) {
+    const response = await this.request('/payments', {
+      method: 'POST',
+      body: JSON.stringify(paymentData),
+    })
+    return { data: response, error: null }
+  }
 }
 
 // Create API client instance
 export const apiClient = new ApiClient(API_BASE_URL)
 
-// Legacy Supabase compatibility
-export const supabase = {
-  auth: {
-    signInWithPassword: async ({ email, password }: { email: string; password: string }) => {
-      try {
-        const response = await apiClient.signIn(email, password)
-        return { data: { user: response.user }, error: null }
-      } catch (error) {
-        return { data: null, error }
-      }
-    },
-    signUp: async ({ email, password, options }: { email: string; password: string; options: { data: { name: string; role: string } } }) => {
-      try {
-        const response = await apiClient.signUp(email, password, options.data.name, options.data.role as 'admin' | 'invoicing_user')
-        return { data: { user: response.user }, error: null }
-      } catch (error) {
-        return { data: null, error }
-      }
-    },
-    signOut: async () => {
-      try {
-        await apiClient.signOut()
-        return { error: null }
-      } catch (error) {
-        return { error }
-      }
-    },
-    getUser: async () => {
-      try {
-        const response = await apiClient.getCurrentUser()
-        return { data: { user: response.user }, error: response.error }
-      } catch (error) {
-        return { data: { user: null }, error }
-      }
-    }
-  }
-}
 
 // Browser client for SSR compatibility
 export const createClientComponentClient = () => {
@@ -195,44 +241,48 @@ export const createClientComponentClient = () => {
 
 // Auth helper functions
 export const signInWithEmail = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  })
-  return { data, error }
+  try {
+    const response = await apiClient.signIn(email, password)
+    return { data: { user: response.user }, error: null }
+  } catch (error) {
+    return { data: null, error }
+  }
 }
 
 export const signUpWithEmail = async (email: string, password: string, name: string, role: 'admin' | 'invoicing_user' = 'invoicing_user') => {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        name,
-        role
-      }
-    }
-  })
-  return { data, error }
+  try {
+    const response = await apiClient.signUp(email, password, name, role)
+    return { data: { user: response.user }, error: null }
+  } catch (error) {
+    return { data: null, error }
+  }
 }
 
 export const signOut = async () => {
-  const { error } = await supabase.auth.signOut()
-  return { error }
+  try {
+    await apiClient.signOut()
+    return { error: null }
+  } catch (error) {
+    return { error }
+  }
 }
 
 export const getCurrentUser = async () => {
-  const { data: { user }, error } = await supabase.auth.getUser()
-  return { user, error }
+  try {
+    const response = await apiClient.getCurrentUser()
+    return { user: response.user, error: response.error }
+  } catch (error) {
+    return { user: null, error }
+  }
 }
 
 export const getUserProfile = async (userId: string) => {
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', userId)
-    .single()
-  return { data, error }
+  try {
+    const response = await apiClient.getUserProfile(userId)
+    return { data: response.data, error: response.error }
+  } catch (error) {
+    return { data: null, error }
+  }
 }
 
 // Database types

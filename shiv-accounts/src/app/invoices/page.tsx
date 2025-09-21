@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { apiClient } from '@/lib/api'
+import ProtectedRoute from '@/components/ProtectedRoute'
 import DashboardInvoices from '@/components/DashboardInvoices'
 import Pagination from '@/components/Pagination'
 import { Edit, Eye, Search, FileText, CreditCard, Plus } from 'lucide-react'
@@ -45,19 +46,8 @@ export default function InvoicesPage() {
 
   const fetchInvoices = async () => {
     try {
-      const { data, error } = await supabase
-        .from('invoices')
-        .select(`
-          *,
-          contacts:contact_id (
-            name,
-            email
-          )
-        `)
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-      setInvoices(data || [])
+      const response = await apiClient.getInvoices()
+      setInvoices(response.data || [])
     } catch (error) {
       console.error('Error fetching invoices:', error)
     } finally {
@@ -140,11 +130,12 @@ export default function InvoicesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <DashboardInvoices 
-        title="Invoices" 
-        subtitle="Manage your sales invoices"
-      />
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50">
+        <DashboardInvoices 
+          title="Invoices" 
+          subtitle="Manage your sales invoices"
+        />
 
       {/* Main Content */}
       <main className="dashboard-main">
@@ -324,6 +315,7 @@ export default function InvoicesPage() {
           onPaymentRecorded={handlePaymentRecorded}
         />
       )}
-    </div>
+      </div>
+    </ProtectedRoute>
   )
 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { apiClient } from '@/lib/api'
+import ProtectedRoute from '@/components/ProtectedRoute'
 import DashboardProducts from '@/components/DashboardProducts'
 import Pagination from '@/components/Pagination'
 import { Edit, Trash2, Search, Package, Plus } from 'lucide-react'
@@ -43,13 +44,8 @@ export default function ProductsPage() {
 
   const fetchProducts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-      setProducts(data || [])
+      const response = await apiClient.getProducts()
+      setProducts(response.data || [])
     } catch (error) {
       console.error('Error fetching products:', error)
     } finally {
@@ -62,34 +58,24 @@ export default function ProductsPage() {
     try {
       if (editingProduct) {
         // Update existing product
-        const { error } = await supabase
-          .from('products')
-          .update({
-            sku: formData.sku,
-            name: formData.name,
-            description: formData.description || null,
-            price: parseFloat(formData.price),
-            tax_percentage: parseFloat(formData.tax_percentage),
-            hsn_code: formData.hsn_code || null,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', editingProduct.id)
-
-        if (error) throw error
+        await apiClient.updateProduct(editingProduct.id, {
+          sku: formData.sku,
+          name: formData.name,
+          description: formData.description || null,
+          price: parseFloat(formData.price),
+          tax_percentage: parseFloat(formData.tax_percentage),
+          hsn_code: formData.hsn_code || null
+        })
       } else {
         // Create new product
-        const { error } = await supabase
-          .from('products')
-          .insert([{
-            sku: formData.sku,
-            name: formData.name,
-            description: formData.description || null,
-            price: parseFloat(formData.price),
-            tax_percentage: parseFloat(formData.tax_percentage),
-            hsn_code: formData.hsn_code || null
-          }])
-
-        if (error) throw error
+        await apiClient.createProduct({
+          sku: formData.sku,
+          name: formData.name,
+          description: formData.description || null,
+          price: parseFloat(formData.price),
+          tax_percentage: parseFloat(formData.tax_percentage),
+          hsn_code: formData.hsn_code || null
+        })
       }
 
       setShowModal(false)
@@ -118,12 +104,7 @@ export default function ProductsPage() {
     if (!confirm('Are you sure you want to delete this product?')) return
 
     try {
-      const { error } = await supabase
-        .from('products')
-        .update({ is_active: false })
-        .eq('id', id)
-
-      if (error) throw error
+      await apiClient.deleteProduct(id)
       fetchProducts()
     } catch (error) {
       console.error('Error deleting product:', error)
@@ -155,11 +136,12 @@ export default function ProductsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <DashboardProducts 
-        title="Products" 
-        subtitle="Manage your product catalog"
-      />
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50">
+        <DashboardProducts 
+          title="Products" 
+          subtitle="Manage your product catalog"
+        />
 
       {/* Main Content */}
       <main className="dashboard-main">
@@ -398,6 +380,7 @@ export default function ProductsPage() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </ProtectedRoute>
   )
 }

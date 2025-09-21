@@ -43,11 +43,12 @@ CREATE TABLE products (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Invoices
+-- Invoices (Customer Invoices)
 CREATE TABLE invoices (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     invoice_number VARCHAR(50) UNIQUE NOT NULL,
     contact_id UUID NOT NULL REFERENCES contacts(id),
+    sale_order_id UUID REFERENCES sale_orders(id),
     invoice_date DATE NOT NULL,
     due_date DATE,
     status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'open', 'partially_paid', 'paid', 'cancelled')),
@@ -112,6 +113,112 @@ CREATE TABLE users (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Purchase Orders
+CREATE TABLE purchase_orders (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    po_number VARCHAR(50) UNIQUE NOT NULL,
+    vendor_id UUID NOT NULL REFERENCES contacts(id),
+    po_date DATE NOT NULL,
+    due_date DATE,
+    status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'sent', 'received', 'cancelled')),
+    subtotal DECIMAL(10,2) DEFAULT 0.00,
+    tax_amount DECIMAL(10,2) DEFAULT 0.00,
+    total_amount DECIMAL(10,2) DEFAULT 0.00,
+    notes TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Purchase Order Line Items
+CREATE TABLE purchase_order_lines (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    purchase_order_id UUID NOT NULL REFERENCES purchase_orders(id) ON DELETE CASCADE,
+    product_id UUID REFERENCES products(id),
+    quantity DECIMAL(10,2) NOT NULL,
+    unit_price DECIMAL(10,2) NOT NULL,
+    line_total DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Vendor Bills
+CREATE TABLE vendor_bills (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    bill_number VARCHAR(50) UNIQUE NOT NULL,
+    vendor_id UUID NOT NULL REFERENCES contacts(id),
+    purchase_order_id UUID REFERENCES purchase_orders(id),
+    bill_date DATE NOT NULL,
+    due_date DATE,
+    status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'open', 'partially_paid', 'paid', 'cancelled')),
+    subtotal DECIMAL(10,2) DEFAULT 0.00,
+    tax_amount DECIMAL(10,2) DEFAULT 0.00,
+    total_amount DECIMAL(10,2) DEFAULT 0.00,
+    paid_amount DECIMAL(10,2) DEFAULT 0.00,
+    notes TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Vendor Bill Line Items
+CREATE TABLE vendor_bill_lines (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    vendor_bill_id UUID NOT NULL REFERENCES vendor_bills(id) ON DELETE CASCADE,
+    product_id UUID REFERENCES products(id),
+    description VARCHAR(200) NOT NULL,
+    quantity DECIMAL(10,2) NOT NULL,
+    unit_price DECIMAL(10,2) NOT NULL,
+    tax_percentage DECIMAL(5,2) DEFAULT 0.00,
+    line_total DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Bill Payments
+CREATE TABLE bill_payments (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    payment_number VARCHAR(50) UNIQUE NOT NULL,
+    vendor_bill_id UUID NOT NULL REFERENCES vendor_bills(id),
+    vendor_id UUID NOT NULL REFERENCES contacts(id),
+    payment_date DATE NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    payment_method VARCHAR(20) DEFAULT 'cash' CHECK (payment_method IN ('cash', 'bank_transfer', 'cheque', 'card')),
+    reference VARCHAR(100),
+    notes TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Sale Orders
+CREATE TABLE sale_orders (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    so_number VARCHAR(50) UNIQUE NOT NULL,
+    customer_id UUID NOT NULL REFERENCES contacts(id),
+    so_date DATE NOT NULL,
+    due_date DATE,
+    status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'sent', 'confirmed', 'cancelled')),
+    subtotal DECIMAL(10,2) DEFAULT 0.00,
+    tax_amount DECIMAL(10,2) DEFAULT 0.00,
+    total_amount DECIMAL(10,2) DEFAULT 0.00,
+    notes TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Sale Order Line Items
+CREATE TABLE sale_order_lines (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    sale_order_id UUID NOT NULL REFERENCES sale_orders(id) ON DELETE CASCADE,
+    product_id UUID REFERENCES products(id),
+    quantity DECIMAL(10,2) NOT NULL,
+    unit_price DECIMAL(10,2) NOT NULL,
+    line_total DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Customer Invoices (reusing existing invoices table)
+-- The existing invoices table will be used for customer invoices
+-- We'll add a field to distinguish between customer and vendor invoices
+
+-- Invoice Payments (reusing existing payments table)
+-- The existing payments table will be used for customer invoice payments
+
 -- Indexes for performance
 CREATE INDEX idx_invoices_contact_id ON invoices(contact_id);
 CREATE INDEX idx_invoices_status ON invoices(status);
@@ -121,6 +228,22 @@ CREATE INDEX idx_ledger_entries_account_id ON ledger_entries(account_id);
 CREATE INDEX idx_ledger_entries_reference ON ledger_entries(reference_type, reference_id);
 CREATE INDEX idx_ledger_entries_date ON ledger_entries(entry_date);
 CREATE INDEX idx_users_email ON users(email);  -- ADDED: For authentication lookups
+
+-- Purchase Order indexes
+CREATE INDEX idx_purchase_orders_vendor_id ON purchase_orders(vendor_id);
+CREATE INDEX idx_purchase_orders_status ON purchase_orders(status);
+CREATE INDEX idx_purchase_order_lines_po_id ON purchase_order_lines(purchase_order_id);
+
+-- Vendor Bill indexes
+CREATE INDEX idx_vendor_bills_vendor_id ON vendor_bills(vendor_id);
+CREATE INDEX idx_vendor_bills_status ON vendor_bills(status);
+CREATE INDEX idx_vendor_bill_lines_bill_id ON vendor_bill_lines(vendor_bill_id);
+CREATE INDEX idx_bill_payments_bill_id ON bill_payments(vendor_bill_id);
+
+-- Sale Order indexes
+CREATE INDEX idx_sale_orders_customer_id ON sale_orders(customer_id);
+CREATE INDEX idx_sale_orders_status ON sale_orders(status);
+CREATE INDEX idx_sale_order_lines_so_id ON sale_order_lines(sale_order_id);
 
 -- Functions for automatic calculations
 CREATE OR REPLACE FUNCTION update_invoice_totals()

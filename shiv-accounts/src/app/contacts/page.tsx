@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { apiClient } from '@/lib/api'
+import ProtectedRoute from '@/components/ProtectedRoute'
 import DashboardContacts from '@/components/DashboardContacts'
 import Pagination from '@/components/Pagination'
 import { Edit, Trash2, Search, Users, Building, Plus } from 'lucide-react'
@@ -41,13 +42,8 @@ export default function ContactsPage() {
 
   const fetchContacts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('contacts')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-      setContacts(data || [])
+      const response = await apiClient.getContacts()
+      setContacts(response.data || [])
     } catch (error) {
       console.error('Error fetching contacts:', error)
     } finally {
@@ -60,32 +56,22 @@ export default function ContactsPage() {
     try {
       if (editingContact) {
         // Update existing contact
-        const { error } = await supabase
-          .from('contacts')
-          .update({
-            name: formData.name,
-            email: formData.email || null,
-            phone: formData.phone || null,
-            address: formData.address || null,
-            contact_type: formData.contact_type,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', editingContact.id)
-
-        if (error) throw error
+        await apiClient.updateContact(editingContact.id, {
+          name: formData.name,
+          email: formData.email || null,
+          phone: formData.phone || null,
+          address: formData.address || null,
+          contact_type: formData.contact_type
+        })
       } else {
         // Create new contact
-        const { error } = await supabase
-          .from('contacts')
-          .insert([{
-            name: formData.name,
-            email: formData.email || null,
-            phone: formData.phone || null,
-            address: formData.address || null,
-            contact_type: formData.contact_type
-          }])
-
-        if (error) throw error
+        await apiClient.createContact({
+          name: formData.name,
+          email: formData.email || null,
+          phone: formData.phone || null,
+          address: formData.address || null,
+          contact_type: formData.contact_type
+        })
       }
 
       setShowModal(false)
@@ -113,12 +99,7 @@ export default function ContactsPage() {
     if (!confirm('Are you sure you want to delete this contact?')) return
 
     try {
-      const { error } = await supabase
-        .from('contacts')
-        .update({ is_active: false })
-        .eq('id', id)
-
-      if (error) throw error
+      await apiClient.deleteContact(id)
       fetchContacts()
     } catch (error) {
       console.error('Error deleting contact:', error)
@@ -150,11 +131,12 @@ export default function ContactsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <DashboardContacts 
-        title="Contacts" 
-        subtitle="Manage your customers and vendors"
-      />
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50">
+        <DashboardContacts 
+          title="Contacts" 
+          subtitle="Manage your customers and vendors"
+        />
 
       {/* Main Content */}
       <main className="dashboard-main">
@@ -375,6 +357,7 @@ export default function ContactsPage() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </ProtectedRoute>
   )
 }
