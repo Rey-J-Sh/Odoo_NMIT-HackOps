@@ -111,7 +111,7 @@ router.post('/', authenticateToken, requireRole(['admin']), [
   body('contact_id').isUUID(),
   body('payment_date').isISO8601(),
   body('amount').isFloat({ min: 0.01 }),
-  body('payment_method').optional().isIn(['cash', 'bank_transfer', 'cheque', 'card']),
+  body('payment_method').optional().isIn(['cash', 'bank_transfer', 'cheque', 'card', 'upi']),
   body('reference').optional().trim(),
   body('notes').optional().trim()
 ], async (req, res) => {
@@ -200,7 +200,7 @@ router.post('/', authenticateToken, requireRole(['admin']), [
 router.put('/:id', authenticateToken, requireRole(['admin']), [
   body('payment_date').optional().isISO8601(),
   body('amount').optional().isFloat({ min: 0.01 }),
-  body('payment_method').optional().isIn(['cash', 'bank_transfer', 'cheque', 'card']),
+  body('payment_method').optional().isIn(['cash', 'bank_transfer', 'cheque', 'card', 'upi']),
   body('reference').optional().trim(),
   body('notes').optional().trim()
 ], async (req, res) => {

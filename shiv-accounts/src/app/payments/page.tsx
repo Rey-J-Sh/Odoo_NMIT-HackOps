@@ -16,7 +16,7 @@ interface Payment {
   contact_id: string
   payment_date: string
   amount: number
-  payment_method: 'cash' | 'bank_transfer' | 'cheque' | 'card'
+  payment_method: 'cash' | 'bank_transfer' | 'cheque' | 'card' | 'upi'
   reference: string | null
   notes: string | null
   created_at: string
@@ -55,6 +55,7 @@ export default function PaymentsPage() {
       case 'bank_transfer': return 'bg-blue-100 text-blue-800'
       case 'cheque': return 'bg-purple-100 text-purple-800'
       case 'card': return 'bg-orange-100 text-orange-800'
+      case 'upi': return 'bg-indigo-100 text-indigo-800'
       default: return 'bg-gray-100 text-gray-800'
     }
   }
@@ -65,6 +66,7 @@ export default function PaymentsPage() {
       case 'bank_transfer': return 'Bank Transfer'
       case 'cheque': return 'Cheque'
       case 'card': return 'Card'
+      case 'upi': return 'UPI'
       default: return method
     }
   }
@@ -149,6 +151,7 @@ export default function PaymentsPage() {
                   <option value="bank_transfer">Bank Transfer</option>
                   <option value="cheque">Cheque</option>
                   <option value="card">Card</option>
+                  <option value="upi">UPI</option>
                 </select>
                 <div className="text-sm text-gray-600">
                   {filteredPayments.length} payment{filteredPayments.length !== 1 ? 's' : ''}

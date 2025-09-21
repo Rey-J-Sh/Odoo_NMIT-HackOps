@@ -28,11 +28,12 @@ export default function PaymentModal({
   const [formData, setFormData] = useState({
     amount: '',
     payment_date: new Date().toISOString().split('T')[0],
-    payment_method: 'cash' as 'cash' | 'bank_transfer' | 'cheque' | 'card',
+    payment_method: 'cash' as 'cash' | 'bank_transfer' | 'cheque' | 'card' | 'upi',
     reference: '',
     notes: ''
   })
   const [loading, setLoading] = useState(false)
+  const [razorpayLoading, setRazorpayLoading] = useState(false)
 
   const remainingAmount = totalAmount - paidAmount
 
@@ -48,8 +49,80 @@ export default function PaymentModal({
     }
   }, [isOpen, remainingAmount])
 
+  const handleRazorpayPayment = async () => {
+    setRazorpayLoading(true)
+    
+    try {
+      // Get invoice details to get contact_id
+      const invoiceResponse = await apiClient.request(`/invoices/${invoiceId}`)
+      
+      if (!invoiceResponse) throw new Error('Invoice not found')
+
+      const amount = parseFloat(formData.amount)
+      const amountInPaise = Math.round(amount * 100) // Convert to paise
+
+      const options = {
+        key: "rzp_test_1DP5mmOlF5G5ag", // Razorpay Test Key ID
+        amount: amountInPaise.toString(),
+        currency: "INR",
+        name: "Shiv Accounts Cloud",
+        description: `Payment for Invoice ${invoiceNumber}`,
+        image: "/next.svg", // You can replace with your logo
+        handler: async function (response: any) {
+          try {
+            // Create payment record in database
+            await apiClient.createPayment({
+              invoice_id: invoiceId,
+              contact_id: invoiceResponse.contact_id,
+              payment_date: formData.payment_date,
+              amount: amount,
+              payment_method: 'upi',
+              reference: response.razorpay_payment_id,
+              notes: formData.notes || `Razorpay Payment ID: ${response.razorpay_payment_id}`
+            })
+
+            alert(`Payment Successful! Payment ID: ${response.razorpay_payment_id}`)
+            onPaymentRecorded()
+            onClose()
+          } catch (error) {
+            console.error('Error recording payment:', error)
+            alert('Payment successful but failed to record in system. Please contact support.')
+          }
+        },
+        prefill: {
+          name: customerName,
+          email: "customer@example.com", // You can get this from invoice data
+          contact: "9999999999" // You can get this from contact data
+        },
+        theme: {
+          color: "#3399cc"
+        },
+        modal: {
+          ondismiss: function() {
+            setRazorpayLoading(false)
+          }
+        }
+      }
+
+      const rzp = new (window as any).Razorpay(options)
+      rzp.open()
+    } catch (error) {
+      console.error('Error initiating Razorpay payment:', error)
+      alert('Error initiating payment. Please try again.')
+      setRazorpayLoading(false)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // If UPI payment method is selected, use Razorpay
+    if (formData.payment_method === 'upi') {
+      await handleRazorpayPayment()
+      return
+    }
+
+    // For other payment methods, use the existing flow
     setLoading(true)
 
     try {
@@ -164,13 +237,14 @@ export default function PaymentModal({
               <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <select
                 value={formData.payment_method}
-                onChange={(e) => setFormData({ ...formData, payment_method: e.target.value as 'cash' | 'bank_transfer' | 'cheque' | 'card' })}
+                onChange={(e) => setFormData({ ...formData, payment_method: e.target.value as 'cash' | 'bank_transfer' | 'cheque' | 'card' | 'upi' })}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="cash">Cash</option>
                 <option value="bank_transfer">Bank Transfer</option>
                 <option value="cheque">Cheque</option>
                 <option value="card">Card</option>
+                <option value="upi">UPI (Razorpay)</option>
               </select>
             </div>
           </div>
@@ -204,15 +278,16 @@ export default function PaymentModal({
           <div className="flex space-x-3 pt-4">
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || razorpayLoading}
               className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Recording...' : 'Record Payment'}
+              {loading ? 'Recording...' : razorpayLoading ? 'Opening Payment...' : formData.payment_method === 'upi' ? 'Pay with UPI' : 'Record Payment'}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors"
+              disabled={loading || razorpayLoading}
+              className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
